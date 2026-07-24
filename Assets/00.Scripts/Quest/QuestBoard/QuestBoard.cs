@@ -25,12 +25,17 @@ public class QuestBoard : MonoBehaviour
         foreach (QuestPin old in GetComponentsInChildren<QuestPin>(true))
             Destroy(old.gameObject);
 
+        Rect boardRect = GetComponent<RectTransform>().rect;
+
         foreach (QuestData q in QuestManager.Instance.AvailableQuests)
         {
             GameObject ig = Instantiate(pinPrefab, transform);
             QuestPin pin = ig.GetComponent<QuestPin>();
-            // pinPosition is an offset in local UI units from the board's center.
-            ig.GetComponent<RectTransform>().localPosition = q.pinPosition;
+            // pinX/pinY are 0-10 sliders; 5 = board center, 0/10 = the board's edges.
+            // Scaling by the board's current rect keeps pins in place across canvas sizes.
+            float x = (q.pinX / 10f - 0.5f) * boardRect.width;
+            float y = (q.pinY / 10f - 0.5f) * boardRect.height;
+            ig.GetComponent<RectTransform>().localPosition = new Vector2(x, y);
             pin.quest = q;
             pin.dialog = DialogSystem.Instance != null ? DialogSystem.Instance.GetDialogById(q.dialogID) : null;
         }

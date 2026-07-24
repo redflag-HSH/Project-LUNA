@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questId: 1
   text: sungigoog is wanting you
-  pinPosition: {x: 0, y: 5}
+  pinX: 5
+  pinY: 5
   dialogID: 1000

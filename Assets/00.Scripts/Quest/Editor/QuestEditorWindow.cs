@@ -14,7 +14,8 @@ public class QuestEditorWindow : EditorWindow
     string _fileName = "NewQuest";
     string _questId = "";
     string _text = "";
-    Vector2 _pinPosition = Vector2.zero;
+    float _pinX = 5f;
+    float _pinY = 5f;
     int _dialogID = 0;
     bool _repeatable = false;
 
@@ -140,7 +141,7 @@ public class QuestEditorWindow : EditorWindow
         EditorGUILayout.Space(4);
         EditorGUILayout.LabelField(_selected.text, EditorStyles.wordWrappedLabel);
         EditorGUILayout.Space(4);
-        EditorGUILayout.LabelField($"Pin Position: {_selected.pinPosition}", EditorStyles.miniLabel);
+        EditorGUILayout.LabelField($"Pin Position: ({_selected.pinX:0.##}, {_selected.pinY:0.##})", EditorStyles.miniLabel);
         EditorGUILayout.LabelField($"Dialog ID: {_selected.dialogID}", EditorStyles.miniLabel);
         EditorGUILayout.LabelField(_selected.repeatable ? "Repeatable: yes" : "Repeatable: no (one-time)", EditorStyles.miniLabel);
         EditorGUILayout.Space(10);
@@ -176,7 +177,9 @@ public class QuestEditorWindow : EditorWindow
         EditorGUILayout.LabelField("Quest Text");
         _text = EditorGUILayout.TextArea(_text, GUILayout.MinHeight(60));
         EditorGUILayout.Space(4);
-        _pinPosition = EditorGUILayout.Vector2Field("Pin Position", _pinPosition);
+        EditorGUILayout.LabelField("Pin Position (0-10, 5 = centered)");
+        _pinX = EditorGUILayout.Slider("Pin X", _pinX, 0f, 10f);
+        _pinY = EditorGUILayout.Slider("Pin Y", _pinY, 0f, 10f);
         _dialogID = EditorGUILayout.IntField("Dialog ID", _dialogID);
         _repeatable = EditorGUILayout.Toggle(
             new GUIContent("Repeatable", "If on, the quest can be acquired again after completion. Off = once only."),
@@ -237,7 +240,8 @@ public class QuestEditorWindow : EditorWindow
         QuestData asset = existing != null ? existing : CreateInstance<QuestData>();
         asset.questId = _questId;
         asset.text = _text;
-        asset.pinPosition = _pinPosition;
+        asset.pinX = _pinX;
+        asset.pinY = _pinY;
         asset.dialogID = _dialogID;
         asset.repeatable = _repeatable;
 
@@ -261,7 +265,8 @@ public class QuestEditorWindow : EditorWindow
         _fileName = "NewQuest";
         _questId = "";
         _text = "";
-        _pinPosition = Vector2.zero;
+        _pinX = 5f;
+        _pinY = 5f;
         _dialogID = 0;
         _repeatable = false;
     }

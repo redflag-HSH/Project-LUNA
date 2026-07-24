@@ -19,7 +19,9 @@ public class QuestData : ScriptableObject
     [TextArea(1, 3)] public string text;
 
     [Space(10)]
-    public Vector2 pinPosition;
+    [Tooltip("Pin position on the board, 0-10 per axis. 5 is centered; 0 is the left/bottom edge, 10 is the right/top edge.")]
+    [Range(0f, 10f)] public float pinX = 5f;
+    [Range(0f, 10f)] public float pinY = 5f;
     public int dialogID;
     [Tooltip("If true, this quest can be acquired again after being completed. Default (false) = acquirable once.")]
     public bool repeatable;
