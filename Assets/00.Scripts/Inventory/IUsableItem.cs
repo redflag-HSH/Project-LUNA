@@ -14,6 +14,9 @@ public interface IUsableItem
     /// <summary>If false, the item is not consumed from inventory on use.</summary>
     bool IsConsumable { get; }
 
+    /// <summary>Seconds before this item can be used again. 0 = no cooldown.</summary>
+    float CooldownDuration { get; }
+
     /// <summary>Apply the item's effect to the player.</summary>
     void OnUse(PlayerControl player);
 }

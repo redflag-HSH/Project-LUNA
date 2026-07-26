@@ -18,9 +18,13 @@ public class TomatoJuice : MonoBehaviour, IUsableItem
     [Tooltip("HP cannot be healed beyond this value (0 = no cap, use maxHp).")]
     public float healCap = 0f;
 
+    [Tooltip("Seconds before this item can be used again. 0 = no cooldown.")]
+    public float cooldownDuration = 0f;
+
     public string ItemName => itemName;
     public int ItemCode => itemCode;
     public bool IsConsumable => false;
+    public float CooldownDuration => cooldownDuration;
 
     public void OnUse(PlayerControl player)
     {

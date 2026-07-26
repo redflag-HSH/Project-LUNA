@@ -20,6 +20,7 @@ public class ItemConsumer : MonoBehaviour
 
     readonly Dictionary<int, IUsableItem> _registry = new();
     readonly Inventory.InventorySlot[] _quickSlots = new Inventory.InventorySlot[3];
+    readonly Dictionary<IUsableItem, float> _cooldownEndTimes = new();
 
     void Awake()
     {
@@ -53,6 +54,28 @@ public class ItemConsumer : MonoBehaviour
         return _quickSlots[index];
     }
 
+    // ── Cooldown ────────────────────────────────────────────────────────────
+
+    public float GetCooldownRemaining(int index)
+    {
+        Inventory.InventorySlot slot = GetQuickSlot(index);
+        if (slot == null) return 0f;
+        if (!TryResolveUsable(slot, out IUsableItem usable)) return 0f;
+        return GetCooldownRemaining(usable);
+    }
+
+    private float GetCooldownRemaining(IUsableItem usable)
+    {
+        if (!_cooldownEndTimes.TryGetValue(usable, out float endTime)) return 0f;
+        return Mathf.Max(0f, endTime - Time.time);
+    }
+
+    private void StartCooldown(IUsableItem usable)
+    {
+        if (usable.CooldownDuration <= 0f) return;
+        _cooldownEndTimes[usable] = Time.time + usable.CooldownDuration;
+    }
+
     // ── Use (called by PlayerControl on key 1/2/3) ────────────────────────────
 
     public void TryAutoUseSunCream()
@@ -61,8 +84,10 @@ public class ItemConsumer : MonoBehaviour
         {
             if (!(usable is SunCream sunCream)) continue;
             if (!_inventory.HasItem(sunCream.ItemCode, sunCream.ItemName)) continue;
+            if (GetCooldownRemaining(sunCream) > 0f) continue;
             _inventory.RemoveItem(sunCream.ItemCode, sunCream.ItemName);
             sunCream.OnUse(_player);
+            StartCooldown(sunCream);
             return;
         }
     }
@@ -78,18 +103,10 @@ public void UseSlot(int index)
             return;
         }
 
-        if (!_registry.TryGetValue(slot.itemCode, out IUsableItem usable))
+        if (!TryResolveUsable(slot, out IUsableItem usable))
         {
-            // Fallback: match by name when itemCode is 0 or unregistered
-            usable = null;
-            foreach (var entry in _registry.Values)
-                if (entry.ItemName == slot.itemName) { usable = entry; break; }
-
-            if (usable == null)
-            {
-                Debug.LogWarning($"[ItemConsumer] No IUsableItem registered for code {slot.itemCode} or name '{slot.itemName}'.");
-                return;
-            }
+            Debug.LogWarning($"[ItemConsumer] No IUsableItem registered for code {slot.itemCode} or name '{slot.itemName}'.");
+            return;
         }
 
         if (!_inventory.HasItem(slot.itemCode, slot.itemName))
@@ -98,10 +115,18 @@ public void UseSlot(int index)
             return;
         }
 
+        float cooldownRemaining = GetCooldownRemaining(usable);
+        if (cooldownRemaining > 0f)
+        {
+            Debug.Log($"[ItemConsumer] '{slot.itemName}' is on cooldown ({cooldownRemaining:F1}s remaining).");
+            return;
+        }
+
         if (usable.IsConsumable)
         {
             _inventory.RemoveItem(slot.itemCode, slot.itemName);
             usable.OnUse(_player);
+            StartCooldown(usable);
 
             if (!_inventory.HasItem(slot.itemCode, slot.itemName))
             {
@@ -112,6 +137,23 @@ public void UseSlot(int index)
         else
         {
             usable.OnUse(_player);
+            StartCooldown(usable);
         }
+    }
+
+    private bool TryResolveUsable(Inventory.InventorySlot slot, out IUsableItem usable)
+    {
+        if (_registry.TryGetValue(slot.itemCode, out usable)) return true;
+
+        // Fallback: match by name when itemCode is 0 or unregistered
+        foreach (var entry in _registry.Values)
+        {
+            if (entry.ItemName != slot.itemName) continue;
+            usable = entry;
+            return true;
+        }
+
+        usable = null;
+        return false;
     }
 }

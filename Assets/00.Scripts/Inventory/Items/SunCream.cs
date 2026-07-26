@@ -12,9 +12,13 @@ public class SunCream : MonoBehaviour, IUsableItem
     [Tooltip("Unique item code.")]
     [SerializeField] private int itemCode = 1;
 
+    [Tooltip("Seconds before this item can be used again. 0 = no cooldown.")]
+    [SerializeField] private float cooldownDuration = 0f;
+
     public string ItemName => itemName;
     public int ItemCode => itemCode;
     public bool IsConsumable => true;
+    public float CooldownDuration => cooldownDuration;
 
     public void OnUse(PlayerControl player)
     {
