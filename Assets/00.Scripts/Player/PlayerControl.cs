@@ -728,12 +728,8 @@ public class PlayerControl : MonoBehaviour, IDamageable
     {
         if (IsDead) return;
 
-        // HP condition: triggers automatically when HP hits 1
-        if (!IsBerserker && !_berserkerUsed && CurrentHp <= 1f)
-        {
-            ActivateBerserker();
-            return;
-        }
+        // HP condition (combat only) is triggered directly from TakeDamage/TakeSpecialDamage,
+        // so the tick HP drain reaching hpDrainFloor never spuriously activates Berserker here.
 
         // Hold condition: hold Gather button for berserkerHoldTime
         if (!IsBerserker && !_berserkerUsed && _gatherHeld)
