@@ -80,6 +80,9 @@ public class PlayerMagicSkill : MonoBehaviour
         if (magicSkillLevelData != null) ApplyMagicLevels();
     }
 
+    private static float ScaleOutgoingDamage(float baseDamage) =>
+        PlayerDebuffer.Instance != null ? baseDamage * PlayerDebuffer.Instance.OutgoingDamageMultiplier : baseDamage;
+
     // ── Magic Skill Level API ─────────────────────────────────────────────────
 
     public void ApplyMagicLevels()
@@ -231,8 +234,9 @@ public class PlayerMagicSkill : MonoBehaviour
 
             if (col.TryGetComponent<IDamageable>(out var target))
             {
-                target.TakeDamage(drainDamage);
-                totalDamage += drainDamage;
+                float scaledDrainDamage = ScaleOutgoingDamage(drainDamage);
+                target.TakeDamage(scaledDrainDamage);
+                totalDamage += scaledDrainDamage;
             }
 
             if (col.TryGetComponent<IMonsterCore>(out var mm))
@@ -264,7 +268,7 @@ public class PlayerMagicSkill : MonoBehaviour
             GameObject spear = Instantiate(bloodSpearPrefab, (Vector2)transform.position + offset, Quaternion.identity);
             if (spear.TryGetComponent<BloodSpear>(out var bs))
             {
-                bs.InitHold(transform, offset, _player.FacingDir(), spearDamage, _player.enemyLayer, _player.bloodPuddleMaker);
+                bs.InitHold(transform, offset, _player.FacingDir(), ScaleOutgoingDamage(spearDamage), _player.enemyLayer, _player.bloodPuddleMaker);
                 _activeSpears.Add(bs);
             }
 
@@ -296,7 +300,7 @@ public class PlayerMagicSkill : MonoBehaviour
         foreach (var col in hits)
         {
             if (col.TryGetComponent<IDamageable>(out var target))
-                target.TakeDamage(hedgehogDamage);
+                target.TakeDamage(ScaleOutgoingDamage(hedgehogDamage));
 
             _effects?.SpawnHedgehogSpike(origin, col.bounds.center, hedgehogSpikeSpeed);
         }

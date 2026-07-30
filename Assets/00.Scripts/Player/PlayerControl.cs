@@ -700,7 +700,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
         var damageable2 = target.GetComponentInParent<IDamageable>();
         if (damageable2 != null)
-            damageable2.TakeDamage(99999f);
+            damageable2.TakeDamage(ScaleOutgoingDamage(99999f));
         else
             Debug.LogWarning("[Deathblow] no IDamageable found on target or parent");
 
@@ -798,7 +798,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         {
             aura.speed = swordAuraSpeed;
             aura.lifetime = swordAuraLifetime;
-            aura.Init(dir, swordAuraDamage, enemyLayer, bloodPuddleMaker);
+            aura.Init(dir, ScaleOutgoingDamage(swordAuraDamage), enemyLayer, bloodPuddleMaker);
         }
     }
 
@@ -818,7 +818,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
             }
 
             if (col.TryGetComponent<IDamageable>(out var damageable))
-                damageable.TakeDamage(99999f);
+                damageable.TakeDamage(ScaleOutgoingDamage(99999f));
         }
     }
 
@@ -857,7 +857,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
                 bool alreadyDead = hit.collider.TryGetComponent<IDamageable>(out var preCheck) && preCheck.IsDead;
                 if (!alreadyDead && hit.collider.TryGetComponent<IDamageable>(out var d))
-                    d.TakeDamage(sliceDamage);
+                    d.TakeDamage(ScaleOutgoingDamage(sliceDamage));
 
                 bool isDead = alreadyDead || !hit.collider.TryGetComponent<IDamageable>(out var m) || m.IsDead;
                 if (isDead && bloodPuddleMaker != null)
@@ -867,7 +867,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
             {
                 SpawnBlood(hit.point, hit.normal);
                 if (hit.collider.TryGetComponent<IDamageable>(out var damageable))
-                    damageable.TakeDamage(sliceDamage);
+                    damageable.TakeDamage(ScaleOutgoingDamage(sliceDamage));
             }
         }
 
@@ -1015,7 +1015,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
             if (hit.collider.TryGetComponent<EnemySliceable>(out var sliceable))
             {
                 bool alreadyDead = hit.collider.TryGetComponent<IDamageable>(out var preCheck) && preCheck.IsDead;
-                if (!alreadyDead && hit.collider.TryGetComponent<IDamageable>(out var d)) d.TakeDamage(quickdrawDamage);
+                if (!alreadyDead && hit.collider.TryGetComponent<IDamageable>(out var d)) d.TakeDamage(ScaleOutgoingDamage(quickdrawDamage));
                 if (!alreadyDead) ApplyBleedToCollider(hit.collider);
                 bool isDead = alreadyDead || !hit.collider.TryGetComponent<IDamageable>(out var m) || m.IsDead;
                 if (isDead)
@@ -1026,7 +1026,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
             }
             else if (hit.collider.TryGetComponent<IDamageable>(out var damageable))
             {
-                damageable.TakeDamage(quickdrawDamage);
+                damageable.TakeDamage(ScaleOutgoingDamage(quickdrawDamage));
                 ApplyBleedToCollider(hit.collider);
             }
         }
@@ -1129,7 +1129,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         int dir = FacingDir();
         Vector2 throwVel = new Vector2(dir * throwForce, throwForce * 0.35f);
 
-        small.Throw(throwVel, throwCollisionDamage, throwDuration, enemyLayer);
+        small.Throw(throwVel, ScaleOutgoingDamage(throwCollisionDamage), throwDuration, enemyLayer);
 
         yield return new WaitForSeconds(0.2f);
         isAttacking = false;
@@ -1184,7 +1184,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
                 {
                     if (col.TryGetComponent<IDamageable>(out var target))
                     {
-                        target.TakeDamage(bodySlamDamage);
+                        target.TakeDamage(ScaleOutgoingDamage(bodySlamDamage));
                         if (target.IsDead && col.TryGetComponent<EnemySliceable>(out var sliceable))
                         {
                             Vector2 slamDir = rb.linearVelocity.sqrMagnitude > 0.01f ? rb.linearVelocity.normalized : Vector2.right * FacingDir();
@@ -1418,6 +1418,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
     {
         if (IsDead || IsInCutscene || hpDrainPerSecond <= 0f) return;
         if (GameManager.Instance != null && GameManager.Instance.State == GameManager.GameState.Boot) return;
+        if (PlayerDebuffer.Instance != null && !PlayerDebuffer.Instance.TickDamageActive) return;
 
         float drain = hpDrainPerSecond * Time.deltaTime;
 
@@ -1540,6 +1541,9 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
     // ���� Helpers ������������������������������������������������������������������������������������������������������������������������������
 
+    float ScaleOutgoingDamage(float baseDamage) =>
+        PlayerDebuffer.Instance != null ? baseDamage * PlayerDebuffer.Instance.OutgoingDamageMultiplier : baseDamage;
+
     void HitEnemies(Vector2 origin, float radius, float damage, Vector2 knockbackForce, float bleedDps = 0f, float bleedDuration = 0f/*, Vector2? sliceDir = null*/)
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(origin, radius, enemyLayer);
@@ -1547,7 +1551,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         {
             if (col.TryGetComponent<IDamageable>(out var target))
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(ScaleOutgoingDamage(damage));
                 if (target.IsDead)
                 {
                     if (bloodPuddleMaker != null)
@@ -1578,7 +1582,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         {
             if (col.TryGetComponent<IDamageable>(out var target))
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(ScaleOutgoingDamage(damage));
                 if (target.IsDead)
                 {
                     if (bloodPuddleMaker != null)
