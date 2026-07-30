@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Sun Cream
   itemCode: 1
+  cooldownDuration: 0
 --- !u!114 &1679086700858165053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,7 +63,8 @@ MonoBehaviour:
   itemName: Blood Pack
   itemCode: 0
   healAmount: 30
-  healCap: 0
+  healCap: 60
+  cooldownDuration: 10
 --- !u!1 &2411665042042783815
 GameObject:
   m_ObjectHideFlags: 0
