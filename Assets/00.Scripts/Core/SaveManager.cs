@@ -66,6 +66,15 @@ public class SaveManager : MonoBehaviour
     }
 
     [Serializable]
+    public class TimeData
+    {
+        public int month;
+        public int day;
+        public int hour;
+        public int min;
+    }
+
+    [Serializable]
     public class QuestSaveData
     {
         public List<string> availableQuestIds = new();
@@ -83,6 +92,7 @@ public class SaveManager : MonoBehaviour
         public List<string> litBonfires = new();
         public List<InventorySlotData> inventory = new();
         public QuestSaveData quests = new();
+        public TimeData time = new();
     }
 
     // ����������������������������������������������������������������������������������������������������������������������������
@@ -206,6 +216,7 @@ public class SaveManager : MonoBehaviour
         RecordSession();
         RecordInventory();
         RecordQuests();
+        RecordTime();
         RecordLitBonfire(bonfire.BonfireId);
         WriteFile();
 
@@ -223,6 +234,7 @@ public class SaveManager : MonoBehaviour
         RecordSession();
         RecordInventory();
         RecordQuests();
+        RecordTime();
         WriteFile();
     }
 
@@ -265,6 +277,7 @@ public class SaveManager : MonoBehaviour
         player.SetBloodMoney(Data.playerStats.bloodMoney);
         ApplyInventory();
         ApplyQuests();
+        ApplyTime();
     }
 
     /// <summary>Returns true if the bonfire with the given ID was lit in the save.</summary>
@@ -393,6 +406,25 @@ public class SaveManager : MonoBehaviour
         if (qm == null) return;
 
         qm.LoadFromSave(Data.quests.availableQuestIds, Data.quests.activeQuestIds, Data.quests.completedQuestIds, Data.quests.activeQuestStages);
+    }
+
+    private void RecordTime()
+    {
+        var time = TimeSystem.Instance;
+        if (time == null) return;
+
+        Data.time.month = time.Month;
+        Data.time.day = time.Day;
+        Data.time.hour = time.Hour;
+        Data.time.min = time.Min;
+    }
+
+    private void ApplyTime()
+    {
+        var time = TimeSystem.Instance;
+        if (time == null) return;
+
+        time.LoadFromSave(Data.time.month, Data.time.day, Data.time.hour, Data.time.min);
     }
 
     private void RecordLitBonfire(string bonfireId)
