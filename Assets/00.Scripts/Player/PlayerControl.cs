@@ -91,7 +91,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         (_slayedParts[(int)BodyPart.LeftLeg] ? 1 : 0) +
         (_slayedParts[(int)BodyPart.RightLeg] ? 1 : 0);
 
-    float EffectiveSpeed => speed * (_isRunning ? runSpeedMultiplier : 1f) * (SlayedLegCount == 2 ? 0.05f : SlayedLegCount == 1 ? 0.50f : 1f);
+    float EffectiveSpeed => speed * BasicStatMultiplier * (_isRunning ? runSpeedMultiplier : 1f) * (SlayedLegCount == 2 ? 0.05f : SlayedLegCount == 1 ? 0.50f : 1f);
     float EffectiveJumpForce => jumpForce * (SlayedLegCount == 2 ? 0f : SlayedLegCount == 1 ? 0.50f : 1f);
     bool CanJump => SlayedLegCount < 2;
     bool AllLimbsCut => SlayedLegCount == 2 && !CanWeakAttack && !CanStrongAttack;
@@ -455,6 +455,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
     void Update()
     {
+        TickEffectiveCaps();
         TickComboWindow();
         TickStaminaRegen();
         TickHpDrain();
@@ -757,7 +758,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         // Countdown while active
         if (IsBerserker)
         {
-            CurrentStamina = maxStamina;
+            CurrentStamina = EffectiveMaxStamina;
             _berserkerTimer -= Time.deltaTime;
             if (_berserkerTimer <= 0f)
                 DeactivateBerserker();
@@ -1416,7 +1417,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
             return;
         }
 
-        CurrentStamina = Mathf.Min(CurrentStamina + staminaRegen * Time.deltaTime, maxStamina);
+        CurrentStamina = Mathf.Min(CurrentStamina + staminaRegen * Time.deltaTime, EffectiveMaxStamina);
     }
 
     void TickRun()
@@ -1427,6 +1428,15 @@ public class PlayerControl : MonoBehaviour, IDamageable
             if (_runHoldTimer >= runHoldTime && IsGrounded())
                 _isRunning = true;
         }
+    }
+
+    // Clamps CurrentHp/CurrentStamina down immediately when day/night shrinks the effective
+    // max (e.g. daylight halving max HP mid-fight costs HP right away, not just on future gains).
+    void TickEffectiveCaps()
+    {
+        if (IsDead) return;
+        if (CurrentHp > EffectiveMaxHp) CurrentHp = EffectiveMaxHp;
+        if (CurrentStamina > EffectiveMaxStamina) CurrentStamina = EffectiveMaxStamina;
     }
 
     void TickHpDrain()
@@ -1471,12 +1481,12 @@ public class PlayerControl : MonoBehaviour, IDamageable
     public void Heal(float amount)
     {
         if (IsDead) return;
-        CurrentHp = Mathf.Min(CurrentHp + amount, maxHp);
+        CurrentHp = Mathf.Min(CurrentHp + amount, EffectiveMaxHp);
     }
 
     public void RestoreStamina(float amount)
     {
-        CurrentStamina = Mathf.Min(CurrentStamina + amount, maxStamina);
+        CurrentStamina = Mathf.Min(CurrentStamina + amount, EffectiveMaxStamina);
     }
 
     public void AddBloodGage(float amount)
@@ -1556,14 +1566,21 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
     // ���� Helpers ������������������������������������������������������������������������������������������������������������������������������
 
+    // Every PlayerBasicStatContainer stat is scaled by this before use (50% day / 100% night
+    // by default via PlayerDebuffer). No PlayerDebuffer present leaves stats unscaled.
+    float BasicStatMultiplier => PlayerDebuffer.Instance != null ? PlayerDebuffer.Instance.BasicStatMultiplier : 1f;
+
+    float EffectiveMaxHp => maxHp * BasicStatMultiplier;
+    float EffectiveMaxStamina => maxStamina * BasicStatMultiplier;
+
     float ScaleOutgoingDamage(float baseDamage)
     {
         float result = baseDamage;
         if (PlayerDebuffer.Instance != null) result *= PlayerDebuffer.Instance.OutgoingDamageMultiplier;
         if (_basicStats != null)
         {
-            result *= 1f + _basicStats.AttackPoint / 100f;
-            if (Random.Range(0f, 100f) < _basicStats.LuckPoint) result *= 2f;
+            result *= 1f + (_basicStats.AttackPoint * BasicStatMultiplier) / 100f;
+            if (Random.Range(0f, 100f) < _basicStats.LuckPoint * BasicStatMultiplier) result *= 2f;
         }
         return result;
     }
@@ -1571,12 +1588,12 @@ public class PlayerControl : MonoBehaviour, IDamageable
     // DefendPoint is subtracted flat from incoming damage (not a percentage); no container
     // present leaves damage unchanged.
     float ApplyDefense(float amount) =>
-        _basicStats != null ? Mathf.Max(0f, amount - _basicStats.DefendPoint) : amount;
+        _basicStats != null ? Mathf.Max(0f, amount - _basicStats.DefendPoint * BasicStatMultiplier) : amount;
 
     // Each AttackSpeedPoint shortens attack startup/recovery by 1%, floored at 80% reduction
     // so swings can never hit a zero/negative duration.
     float AttackSpeedTimeScale =>
-        _basicStats != null ? Mathf.Max(0.2f, 1f - _basicStats.AttackSpeedPoint / 100f) : 1f;
+        _basicStats != null ? Mathf.Max(0.2f, 1f - (_basicStats.AttackSpeedPoint * BasicStatMultiplier) / 100f) : 1f;
 
     void HitEnemies(Vector2 origin, float radius, float damage, Vector2 knockbackForce, float bleedDps = 0f, float bleedDuration = 0f/*, Vector2? sliceDir = null*/)
     {

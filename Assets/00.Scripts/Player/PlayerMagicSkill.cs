@@ -85,11 +85,12 @@ public class PlayerMagicSkill : MonoBehaviour
     private float ScaleOutgoingDamage(float baseDamage)
     {
         float result = baseDamage;
+        float basicStatMultiplier = PlayerDebuffer.Instance != null ? PlayerDebuffer.Instance.BasicStatMultiplier : 1f;
         if (PlayerDebuffer.Instance != null) result *= PlayerDebuffer.Instance.OutgoingDamageMultiplier;
         if (_basicStats != null)
         {
-            result *= 1f + _basicStats.AttackPoint / 100f;
-            if (Random.Range(0f, 100f) < _basicStats.LuckPoint) result *= 2f;
+            result *= 1f + (_basicStats.AttackPoint * basicStatMultiplier) / 100f;
+            if (Random.Range(0f, 100f) < _basicStats.LuckPoint * basicStatMultiplier) result *= 2f;
         }
         return result;
     }
