@@ -163,12 +163,14 @@ public class GameManager : MonoBehaviour
     {
         SetState(GameState.Boot);
         StartCoroutine(LoadSceneRoutine(sceneName, Vector2.zero));
+        TimeSystem.Instance.stopTimeSet();
     }
 
     public void LoadScene(string sceneName, Vector2 spawnPosition)
     {
         SetState(GameState.Boot);
         StartCoroutine(LoadSceneRoutine(sceneName, spawnPosition));
+        TimeSystem.Instance.stopTimeSet();
     }
 
     private IEnumerator LoadSceneRoutine(string sceneName, Vector2? spawn)
@@ -203,6 +205,7 @@ public class GameManager : MonoBehaviour
             ApplySpawnOverride(SceneLoader.SpawnOverride);
             SceneLoader.Clear();
             SetState(GameState.Playing);
+            TimeSystem.Instance.StartTimeSet();
         }
     }
 

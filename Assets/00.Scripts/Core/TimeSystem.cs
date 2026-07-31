@@ -29,6 +29,10 @@ public class TimeSystem : MonoBehaviour
     {
         StartCoroutine(timeSetter());
     }
+    public void stopTimeSet()
+    {
+        StopAllCoroutines();
+    }
     IEnumerator timeSetter()
     {
         yield return new WaitForSeconds(3f);
@@ -78,6 +82,7 @@ public class TimeSystem : MonoBehaviour
                     _month = 1;
             }
         }
+        StartCoroutine(timeSetter());
     }
     public void LoadFromSave(int month, int day, int hour, int min)
     {
