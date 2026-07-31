@@ -95,7 +95,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
     float EffectiveJumpForce => jumpForce * (SlayedLegCount == 2 ? 0f : SlayedLegCount == 1 ? 0.50f : 1f);
     bool CanJump => SlayedLegCount < 2;
     bool AllLimbsCut => SlayedLegCount == 2 && !CanWeakAttack && !CanStrongAttack;
-    float AttackDelayMultiplier => SlayedLegCount == 2 ? 2.2f : SlayedLegCount == 1 ? 1.5f : 1f;
+    float AttackDelayMultiplier => (SlayedLegCount == 2 ? 2.2f : SlayedLegCount == 1 ? 1.5f : 1f) * AttackSpeedTimeScale;
     float DodgeDelayMultiplier => SlayedLegCount == 2 ? 2.0f : 1f;
     float EffectiveDodgeForce => dodgeForce * (SlayedLegCount == 2 ? 0.5f : 1f);
 
@@ -1568,6 +1568,11 @@ public class PlayerControl : MonoBehaviour, IDamageable
     // present leaves damage unchanged.
     float ApplyDefense(float amount) =>
         _basicStats != null ? Mathf.Max(0f, amount - _basicStats.DefendPoint) : amount;
+
+    // Each AttackSpeedPoint shortens attack startup/recovery by 1%, floored at 80% reduction
+    // so swings can never hit a zero/negative duration.
+    float AttackSpeedTimeScale =>
+        _basicStats != null ? Mathf.Max(0.2f, 1f - _basicStats.AttackSpeedPoint / 100f) : 1f;
 
     void HitEnemies(Vector2 origin, float radius, float damage, Vector2 knockbackForce, float bleedDps = 0f, float bleedDuration = 0f/*, Vector2? sliceDir = null*/)
     {
