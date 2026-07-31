@@ -72,16 +72,27 @@ public class PlayerMagicSkill : MonoBehaviour
     private EffectGenerator _effects;
     private readonly List<BloodSpear> _activeSpears = new();
     private Coroutine _holdCoroutine;
+    private PlayerBasicStatContainer _basicStats;
 
     void Awake()
     {
         _player = GetComponent<PlayerControl>();
         _effects = GetComponent<EffectGenerator>();
+        _basicStats = GetComponent<PlayerBasicStatContainer>();
         if (magicSkillLevelData != null) ApplyMagicLevels();
     }
 
-    private static float ScaleOutgoingDamage(float baseDamage) =>
-        PlayerDebuffer.Instance != null ? baseDamage * PlayerDebuffer.Instance.OutgoingDamageMultiplier : baseDamage;
+    private float ScaleOutgoingDamage(float baseDamage)
+    {
+        float result = baseDamage;
+        if (PlayerDebuffer.Instance != null) result *= PlayerDebuffer.Instance.OutgoingDamageMultiplier;
+        if (_basicStats != null)
+        {
+            result *= 1f + _basicStats.AttackPoint / 100f;
+            if (Random.Range(0f, 100f) < _basicStats.LuckPoint) result *= 2f;
+        }
+        return result;
+    }
 
     // ── Magic Skill Level API ─────────────────────────────────────────────────
 

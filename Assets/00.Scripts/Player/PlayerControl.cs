@@ -1560,7 +1560,11 @@ public class PlayerControl : MonoBehaviour, IDamageable
     {
         float result = baseDamage;
         if (PlayerDebuffer.Instance != null) result *= PlayerDebuffer.Instance.OutgoingDamageMultiplier;
-        if (_basicStats != null) result *= 1f + _basicStats.AttackPoint / 100f;
+        if (_basicStats != null)
+        {
+            result *= 1f + _basicStats.AttackPoint / 100f;
+            if (Random.Range(0f, 100f) < _basicStats.LuckPoint) result *= 2f;
+        }
         return result;
     }
 
