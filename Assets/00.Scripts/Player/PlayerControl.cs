@@ -364,15 +364,14 @@ public class PlayerControl : MonoBehaviour, IDamageable
         rb.freezeRotation = true;
         sr = GetComponent<SpriteRenderer>();
 
-        // PlayerBasicStatContainer is optional — when present and populated, its values
-        // override the Inspector defaults; a value of 0 means "not configured yet", so
-        // the Inspector default is kept (this also covers the container not existing at all).
+        // PlayerBasicStatContainer is optional — when present, its stats are authoritative
+        // and override the Inspector defaults; when absent, the Inspector defaults stand.
         _basicStats = GetComponent<PlayerBasicStatContainer>();
         if (_basicStats != null)
         {
-            if (_basicStats.HealthPoint > 0) maxHp = _basicStats.HealthPoint;
-            if (_basicStats.StaminaPoint > 0) maxStamina = _basicStats.StaminaPoint;
-            if (_basicStats.MoveSpeedPoint > 0) speed = _basicStats.MoveSpeedPoint;
+            maxHp = _basicStats.HealthPoint;
+            maxStamina = _basicStats.StaminaPoint;
+            speed = _basicStats.MoveSpeedPoint;
         }
 
         CurrentHp = maxHp;
@@ -1565,8 +1564,8 @@ public class PlayerControl : MonoBehaviour, IDamageable
         return result;
     }
 
-    // Every AttackPoint/DefendPoint is treated as a 1% bonus/reduction; 0 (container absent
-    // or not yet configured) leaves damage unchanged.
+    // Every AttackPoint/DefendPoint is treated as a 1% bonus/reduction; no container present
+    // leaves damage unchanged.
     float DefendDamageMultiplier =>
         _basicStats != null ? Mathf.Clamp01(1f - _basicStats.DefendPoint / 100f) : 1f;
 
