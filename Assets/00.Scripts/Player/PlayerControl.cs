@@ -350,6 +350,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
     PlayerMagicSkill playerMagicSkill;
     ImsiIlustChanger _illustChanger;
     ItemConsumer _itemConsumer;
+    PlayerBasicStatContainer _basicStats;
 
     // ���� Unity ����������������������������������������������������������������������������������������������������������������������������������
 
@@ -362,6 +363,18 @@ public class PlayerControl : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
         sr = GetComponent<SpriteRenderer>();
+
+        // PlayerBasicStatContainer is optional — when present and populated, its values
+        // override the Inspector defaults; a value of 0 means "not configured yet", so
+        // the Inspector default is kept (this also covers the container not existing at all).
+        _basicStats = GetComponent<PlayerBasicStatContainer>();
+        if (_basicStats != null)
+        {
+            if (_basicStats.HealthPoint > 0) maxHp = _basicStats.HealthPoint;
+            if (_basicStats.StaminaPoint > 0) maxStamina = _basicStats.StaminaPoint;
+            if (_basicStats.MoveSpeedPoint > 0) speed = _basicStats.MoveSpeedPoint;
+        }
+
         CurrentHp = maxHp;
         CurrentStamina = maxStamina;
         CurrentSunproofGuard = maxSunproofGuard;
@@ -1317,6 +1330,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
     public void TakeSpecialDamage(float amount)
     {
         if (IsInvincible || IsBerserker) return;
+        amount *= DefendDamageMultiplier;
         CurrentHp -= amount;
         StartCoroutine(HitFlash(Color.red));
         SlayRandomBodyPart();
@@ -1341,6 +1355,8 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
             amount *= (1f - guardDamageReduction);
         }
+
+        amount *= DefendDamageMultiplier;
 
         CurrentHp -= amount;
         StartCoroutine(HitFlash(Color.red));
@@ -1541,8 +1557,18 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
     // ���� Helpers ������������������������������������������������������������������������������������������������������������������������������
 
-    float ScaleOutgoingDamage(float baseDamage) =>
-        PlayerDebuffer.Instance != null ? baseDamage * PlayerDebuffer.Instance.OutgoingDamageMultiplier : baseDamage;
+    float ScaleOutgoingDamage(float baseDamage)
+    {
+        float result = baseDamage;
+        if (PlayerDebuffer.Instance != null) result *= PlayerDebuffer.Instance.OutgoingDamageMultiplier;
+        if (_basicStats != null) result *= 1f + _basicStats.AttackPoint / 100f;
+        return result;
+    }
+
+    // Every AttackPoint/DefendPoint is treated as a 1% bonus/reduction; 0 (container absent
+    // or not yet configured) leaves damage unchanged.
+    float DefendDamageMultiplier =>
+        _basicStats != null ? Mathf.Clamp01(1f - _basicStats.DefendPoint / 100f) : 1f;
 
     void HitEnemies(Vector2 origin, float radius, float damage, Vector2 knockbackForce, float bleedDps = 0f, float bleedDuration = 0f/*, Vector2? sliceDir = null*/)
     {
