@@ -1329,7 +1329,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
     public void TakeSpecialDamage(float amount)
     {
         if (IsInvincible || IsBerserker) return;
-        amount *= DefendDamageMultiplier;
+        amount = ApplyDefense(amount);
         CurrentHp -= amount;
         StartCoroutine(HitFlash(Color.red));
         SlayRandomBodyPart();
@@ -1355,7 +1355,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
             amount *= (1f - guardDamageReduction);
         }
 
-        amount *= DefendDamageMultiplier;
+        amount = ApplyDefense(amount);
 
         CurrentHp -= amount;
         StartCoroutine(HitFlash(Color.red));
@@ -1564,10 +1564,10 @@ public class PlayerControl : MonoBehaviour, IDamageable
         return result;
     }
 
-    // Every AttackPoint/DefendPoint is treated as a 1% bonus/reduction; no container present
-    // leaves damage unchanged.
-    float DefendDamageMultiplier =>
-        _basicStats != null ? Mathf.Clamp01(1f - _basicStats.DefendPoint / 100f) : 1f;
+    // DefendPoint is subtracted flat from incoming damage (not a percentage); no container
+    // present leaves damage unchanged.
+    float ApplyDefense(float amount) =>
+        _basicStats != null ? Mathf.Max(0f, amount - _basicStats.DefendPoint) : amount;
 
     void HitEnemies(Vector2 origin, float radius, float damage, Vector2 knockbackForce, float bleedDps = 0f, float bleedDuration = 0f/*, Vector2? sliceDir = null*/)
     {
