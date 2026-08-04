@@ -32,6 +32,7 @@ public class QuestManager : MonoBehaviour
     // ── State ─────────────────────────────────────────────────────────────────
 
     const int MaxAvailableQuests = 10;
+    const int MaxActiveQuests = 1;
 
     readonly List<QuestData> _available = new();
     readonly List<QuestData> _active = new();
@@ -97,6 +98,10 @@ public class QuestManager : MonoBehaviour
     {
         if (quest == null || _active.Contains(quest)) return;
         if (!quest.repeatable && _completed.Contains(quest.questId)) return;
+        // Fallback: player already has an active quest, and can only run one at a time —
+        // leave the requested quest in _available so it can still be accepted once the
+        // current one is completed or abandoned.
+        if (_active.Count >= MaxActiveQuests) return;
         _available.Remove(quest);
         _active.Add(quest);
         _stages[quest.questId] = QuestStage.TalkToClient;
