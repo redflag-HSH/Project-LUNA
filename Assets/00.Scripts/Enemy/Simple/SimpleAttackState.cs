@@ -7,6 +7,7 @@ public class SimpleAttackState : BaseState
     readonly MonoBehaviour _mb;
     bool _attacking;
     IMonsterCore.AttackPattern _pattern;
+    Coroutine _attackCoroutine;
 
     public SimpleAttackState(IMonsterCore e) { _e = e; _mb = (MonoBehaviour)e; }
 
@@ -16,7 +17,7 @@ public class SimpleAttackState : BaseState
         if (Time.time >= _e.NextAttackTime)
         {
             _pattern = _e.PickRandomPattern();
-            _mb.StartCoroutine(Attack());
+            _attackCoroutine = _mb.StartCoroutine(Attack());
         }
     }
 
@@ -28,7 +29,11 @@ public class SimpleAttackState : BaseState
             StateMachine.ChangeState(new SimpleChaseState(_e));
     }
 
-    public override void Exit() { }
+    public override void Exit()
+    {
+        if (_attackCoroutine != null)
+            _mb.StopCoroutine(_attackCoroutine);
+    }
 
     IEnumerator Attack()
     {

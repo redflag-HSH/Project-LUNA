@@ -7,6 +7,7 @@ public class MiddleAttackState : BaseState
     readonly MonoBehaviour _mb;
     bool _attacking;
     IMonsterCore.AttackPattern _pattern;
+    Coroutine _attackCoroutine;
 
     public MiddleAttackState(MiddleEnemy e) { _e = e; _mb = e; }
 
@@ -17,7 +18,7 @@ public class MiddleAttackState : BaseState
         {
             bool playerIsDown = _e.PlayerCtrl != null && _e.PlayerCtrl.IsDown;
             _pattern = playerIsDown ? _e.PickSpecialPattern() : _e.PickRandomPattern();
-            _mb.StartCoroutine(Attack());
+            _attackCoroutine = _mb.StartCoroutine(Attack());
         }
     }
 
@@ -29,7 +30,11 @@ public class MiddleAttackState : BaseState
             StateMachine.ChangeState(new SimpleChaseState(_e));
     }
 
-    public override void Exit() { }
+    public override void Exit()
+    {
+        if (_attackCoroutine != null)
+            _mb.StopCoroutine(_attackCoroutine);
+    }
 
     IEnumerator Attack()
     {
