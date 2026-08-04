@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class QuestBoard : MonoBehaviour
 {
     [SerializeField] GameObject pinPrefab;
+    [SerializeField] int maxDisplayedQuests = 10;
     void Start()
     {
         Show(false);
@@ -26,9 +27,12 @@ public class QuestBoard : MonoBehaviour
             Destroy(old.gameObject);
 
         Rect boardRect = GetComponent<RectTransform>().rect;
+        IReadOnlyList<QuestData> available = QuestManager.Instance.AvailableQuests;
+        int shownCount = Mathf.Min(available.Count, maxDisplayedQuests);
 
-        foreach (QuestData q in QuestManager.Instance.AvailableQuests)
+        for (int i = 0; i < shownCount; i++)
         {
+            QuestData q = available[i];
             GameObject ig = Instantiate(pinPrefab, transform);
             QuestPin pin = ig.GetComponent<QuestPin>();
             // pinX/pinY are 0-10 sliders; 5 = board center, 0/10 = the board's edges.
