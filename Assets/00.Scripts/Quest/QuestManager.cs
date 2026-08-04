@@ -31,6 +31,8 @@ public class QuestManager : MonoBehaviour
 
     // ── State ─────────────────────────────────────────────────────────────────
 
+    const int MaxAvailableQuests = 10;
+
     readonly List<QuestData> _available = new();
     readonly List<QuestData> _active = new();
     readonly HashSet<string> _completed = new();
@@ -80,6 +82,7 @@ public class QuestManager : MonoBehaviour
         if (_active.Contains(quest)) return;
         // A completed quest can only be offered again if it is repeatable.
         if (!quest.repeatable && _completed.Contains(quest.questId)) return;
+        if (_available.Count >= MaxAvailableQuests) return;
         _available.Add(quest);
         OnQuestsChanged?.Invoke();
     }
