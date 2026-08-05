@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Small card shown when a quest board pin is clicked — just the quest's name and
+/// Small card shown when a quest board pin is clicked — just the quest's
 /// info, with a choice to accept it or not. Replaces opening a full dedicated
 /// dialog per quest.
 ///
@@ -11,7 +11,6 @@ using UnityEngine.UI;
 ///   Canvas
 ///   └─ QuestAcceptPanel (this script)
 ///      └─ Panel            (background, assign as `panel`)
-///         ├─ NameText      (TextMeshProUGUI)
 ///         ├─ InfoText      (TextMeshProUGUI)
 ///         ├─ AcceptButton  (Button)
 ///         └─ DeclineButton (Button)
@@ -21,7 +20,6 @@ public class QuestAcceptPanel : MonoBehaviour
     public static QuestAcceptPanel Instance { get; private set; }
 
     [SerializeField] GameObject panel;
-    [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] TextMeshProUGUI infoText;
     [SerializeField] Button acceptButton;
     [SerializeField] Button declineButton;
@@ -48,7 +46,6 @@ public class QuestAcceptPanel : MonoBehaviour
         if (quest == null) return;
 
         _quest = quest;
-        if (nameText != null) nameText.text = quest.questName;
         if (infoText != null) infoText.text = quest.info;
         if (panel != null) panel.SetActive(true);
     }
