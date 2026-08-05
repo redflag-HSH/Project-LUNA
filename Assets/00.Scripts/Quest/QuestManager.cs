@@ -94,18 +94,21 @@ public class QuestManager : MonoBehaviour
             OnQuestsChanged?.Invoke();
     }
 
-    public void AddQuest(QuestData quest)
+    /// <returns>False if the quest could not be made active (already active/completed,
+    /// or — most commonly — the player already has an active quest).</returns>
+    public bool AddQuest(QuestData quest)
     {
-        if (quest == null || _active.Contains(quest)) return;
-        if (!quest.repeatable && _completed.Contains(quest.questId)) return;
+        if (quest == null || _active.Contains(quest)) return false;
+        if (!quest.repeatable && _completed.Contains(quest.questId)) return false;
         // Fallback: player already has an active quest, and can only run one at a time —
         // leave the requested quest in _available so it can still be accepted once the
         // current one is completed or abandoned.
-        if (_active.Count >= MaxActiveQuests) return;
+        if (_active.Count >= MaxActiveQuests) return false;
         _available.Remove(quest);
         _active.Add(quest);
         _stages[quest.questId] = QuestStage.TalkToClient;
         OnQuestsChanged?.Invoke();
+        return true;
     }
 
     public void CompleteQuest(QuestData quest)

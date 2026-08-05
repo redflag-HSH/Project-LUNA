@@ -12,6 +12,7 @@ using UnityEngine.UI;
 ///   └─ QuestAcceptPanel (this script)
 ///      └─ Panel            (background, assign as `panel`)
 ///         ├─ InfoText      (TextMeshProUGUI)
+///         ├─ MessageText   (TextMeshProUGUI — shown when accepting fails, e.g. already have an active quest)
 ///         ├─ AcceptButton  (Button)
 ///         └─ DeclineButton (Button)
 /// </summary>
@@ -21,8 +22,11 @@ public class QuestAcceptPanel : MonoBehaviour
 
     [SerializeField] GameObject panel;
     [SerializeField] TextMeshProUGUI infoText;
+    [SerializeField] TextMeshProUGUI messageText;
     [SerializeField] Button acceptButton;
     [SerializeField] Button declineButton;
+
+    [SerializeField] string cantAcceptMessage = "퀘스트는 한 번에 하나만 진행할 수 있습니다.";
 
     QuestData _quest;
 
@@ -47,6 +51,7 @@ public class QuestAcceptPanel : MonoBehaviour
 
         _quest = quest;
         if (infoText != null) infoText.text = quest.info;
+        SetMessage(null);
         if (panel != null) panel.SetActive(true);
     }
 
@@ -58,8 +63,18 @@ public class QuestAcceptPanel : MonoBehaviour
 
     void Accept()
     {
-        if (_quest != null && QuestManager.Instance != null)
-            QuestManager.Instance.AddQuest(_quest);
-        Hide();
+        if (_quest == null || QuestManager.Instance == null) return;
+
+        if (QuestManager.Instance.AddQuest(_quest))
+            Hide();
+        else
+            SetMessage(cantAcceptMessage);
+    }
+
+    void SetMessage(string message)
+    {
+        if (messageText == null) return;
+        messageText.text = message;
+        messageText.gameObject.SetActive(!string.IsNullOrEmpty(message));
     }
 }
