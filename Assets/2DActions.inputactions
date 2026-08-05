@@ -124,6 +124,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "DialogFastForward",
+                    "type": "Button",
+                    "id": "f1a2b3c4-5d6e-4f70-8a9b-0c1d2e3f4a5b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "UseItem1",
                     "type": "Button",
                     "id": "aa000001-0000-0000-0000-000000000001",
@@ -413,6 +422,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Log",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a9b8c7d6-1e2f-4a3b-9c0d-5e6f7a8b9c0d",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "DialogFastForward",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

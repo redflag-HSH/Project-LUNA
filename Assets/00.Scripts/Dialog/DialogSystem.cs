@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 
@@ -53,6 +54,10 @@ public class DialogSystem : MonoBehaviour
     [Tooltip("Characters per second. 0 = instant.")]
     public float charsPerSecond = 40f;
 
+    [Header("Fast Forward")]
+    [Tooltip("Hold Left Ctrl to instantly display each line and auto-advance without waiting for Interact.")]
+    [SerializeField] float fastForwardAdvanceDelay = 0.15f;
+
     [Header("Choices")]
     [Tooltip("Parent transform where choice buttons are spawned.")]
     public Transform choiceContainer;
@@ -83,6 +88,9 @@ public class DialogSystem : MonoBehaviour
     PlayableDirector timelineDirector;
     bool restoreInputOnClose = true;
 
+    _2DActions actions;
+    float fastForwardTimer;
+
 
     // ── Unity ─────────────────────────────────────────────────────────────────
 
@@ -91,6 +99,52 @@ public class DialogSystem : MonoBehaviour
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         dialogPanel.SetActive(false);
+        actions = new _2DActions();
+    }
+
+    void OnEnable()
+    {
+        actions.Player2D.DialogFastForward.Enable();
+    }
+
+    void OnDisable()
+    {
+        actions.Player2D.DialogFastForward.Disable();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+        actions?.Dispose();
+    }
+
+    void Update()
+    {
+        if (!IsOpen || isShowingChoices)
+        {
+            fastForwardTimer = 0f;
+            return;
+        }
+
+        if (!actions.Player2D.DialogFastForward.IsPressed())
+        {
+            fastForwardTimer = 0f;
+            return;
+        }
+
+        if (isTyping)
+        {
+            SkipTypewriter();
+            fastForwardTimer = 0f;
+            return;
+        }
+
+        fastForwardTimer += Time.deltaTime;
+        if (fastForwardTimer >= fastForwardAdvanceDelay)
+        {
+            fastForwardTimer = 0f;
+            Advance();
+        }
     }
 
 #if UNITY_EDITOR
