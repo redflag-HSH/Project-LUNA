@@ -15,9 +15,11 @@ using UnityEngine.InputSystem;
 /// Entry prefab (assign as `logEntryPrefab`) needs a DialogLogEntryView on its
 /// root, with a name text and a content text.
 ///
-/// Opened/closed via the Log action (2DActions/Player2D/Log, bound to the L key, only
-/// while a dialog is open) or by right-clicking the dialog box — see DialogBoxLogTrigger,
-/// which should sit on the same GameObject as the dialog box.
+/// Opened via the Log action (2DActions/Player2D/Log, bound to the L key, only while a
+/// dialog is open) or by right-clicking the dialog box — see DialogBoxLogTrigger, which
+/// should sit on the same GameObject as the dialog box. Closed the same way (L toggles),
+/// or by right-clicking the log panel itself — see DialogLogCloseTrigger, which should
+/// sit on the log panel's background.
 /// </summary>
 public class DialogLogScreen : MonoBehaviour
 {
