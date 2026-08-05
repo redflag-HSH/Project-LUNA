@@ -1,8 +1,22 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
+
+/// <summary>One recorded line for the log screen — speaker name (may be blank) and body text.</summary>
+public readonly struct DialogLogEntry
+{
+    public readonly string speakerName;
+    public readonly string text;
+
+    public DialogLogEntry(string speakerName, string text)
+    {
+        this.speakerName = speakerName;
+        this.text = text;
+    }
+}
 
 /// <summary>
 /// Blue-Archive-style dialog system.
@@ -50,6 +64,11 @@ public class DialogSystem : MonoBehaviour
     [SerializeField] Dialog[] dialogRegistry;
 
     public bool IsOpen { get; private set; }
+
+    // ── Log ───────────────────────────────────────────────────────────────────
+
+    readonly List<DialogLogEntry> _history = new();
+    public IReadOnlyList<DialogLogEntry> History => _history;
 
     // ── State ─────────────────────────────────────────────────────────────────
 
@@ -136,6 +155,7 @@ public class DialogSystem : MonoBehaviour
     public void Advance()
     {
         if (!IsOpen || isShowingChoices) return;
+        if (DialogLogScreen.Instance != null && DialogLogScreen.Instance.IsOpen) return;
 
         if (isTyping)
         {
@@ -257,6 +277,8 @@ public class DialogSystem : MonoBehaviour
             Close();
             return;
         }
+
+        _history.Add(new DialogLogEntry(line.speakerName, line.text));
 
         // ── Portraits ──
         if (dialogIlust != null) dialogIlust.Apply(line);
