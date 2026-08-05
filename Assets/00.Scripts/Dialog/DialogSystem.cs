@@ -67,6 +67,8 @@ public class DialogSystem : MonoBehaviour
 
     // ── Log ───────────────────────────────────────────────────────────────────
 
+    const int MaxHistoryLines = 30;
+
     readonly List<DialogLogEntry> _history = new();
     public IReadOnlyList<DialogLogEntry> History => _history;
 
@@ -279,6 +281,8 @@ public class DialogSystem : MonoBehaviour
         }
 
         _history.Add(new DialogLogEntry(line.speakerName, line.text));
+        if (_history.Count > MaxHistoryLines)
+            _history.RemoveAt(0);
 
         // ── Portraits ──
         if (dialogIlust != null) dialogIlust.Apply(line);

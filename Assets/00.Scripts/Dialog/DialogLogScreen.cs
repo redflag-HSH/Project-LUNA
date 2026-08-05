@@ -1,9 +1,10 @@
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
-/// Simple backlog panel — shows every dialog line seen this session
+/// Simple backlog panel — shows the last 30 dialog lines seen this session
 /// (DialogSystem.History) in one scrollable text block.
 ///
 /// UI hierarchy to build in the Inspector:
@@ -13,7 +14,8 @@ using UnityEngine;
 ///         └─ Content
 ///            └─ LogText (TextMeshProUGUI, with a ContentSizeFitter so it grows with the text)
 ///
-/// Open/close this from a "Log" button placed in the dialog box (Button.onClick → Toggle()).
+/// Opened/closed via the L key (while a dialog is open) or by right-clicking the dialog
+/// box — see DialogBoxLogTrigger, which should sit on the same GameObject as the dialog box.
 /// </summary>
 public class DialogLogScreen : MonoBehaviour
 {
@@ -37,6 +39,13 @@ public class DialogLogScreen : MonoBehaviour
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
+    }
+
+    void Update()
+    {
+        if (DialogSystem.Instance == null || !DialogSystem.Instance.IsOpen) return;
+        if (Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame)
+            Toggle();
     }
 
     public void Toggle()
