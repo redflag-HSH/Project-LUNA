@@ -115,6 +115,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Log",
+                    "type": "Button",
+                    "id": "c3d99f21-8a44-4e3b-9c77-1f4a6b52e9d0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "UseItem1",
                     "type": "Button",
                     "id": "aa000001-0000-0000-0000-000000000001",
@@ -393,6 +402,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "GrabThrow",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d47a1e83-6b19-4f2c-8e05-3a9c7d1b4f66",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Log",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

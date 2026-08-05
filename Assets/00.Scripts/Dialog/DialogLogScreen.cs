@@ -14,8 +14,9 @@ using UnityEngine.InputSystem;
 ///         └─ Content
 ///            └─ LogText (TextMeshProUGUI, with a ContentSizeFitter so it grows with the text)
 ///
-/// Opened/closed via the L key (while a dialog is open) or by right-clicking the dialog
-/// box — see DialogBoxLogTrigger, which should sit on the same GameObject as the dialog box.
+/// Opened/closed via the Log action (2DActions/Player2D/Log, bound to the L key, only
+/// while a dialog is open) or by right-clicking the dialog box — see DialogBoxLogTrigger,
+/// which should sit on the same GameObject as the dialog box.
 /// </summary>
 public class DialogLogScreen : MonoBehaviour
 {
@@ -29,23 +30,38 @@ public class DialogLogScreen : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
+    _2DActions actions;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         if (logPanel != null) logPanel.SetActive(false);
+        actions = new _2DActions();
+    }
+
+    void OnEnable()
+    {
+        actions.Player2D.Log.performed += OnLogPressed;
+        actions.Player2D.Log.Enable();
+    }
+
+    void OnDisable()
+    {
+        actions.Player2D.Log.performed -= OnLogPressed;
+        actions.Player2D.Log.Disable();
     }
 
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
+        actions?.Dispose();
     }
 
-    void Update()
+    void OnLogPressed(InputAction.CallbackContext _)
     {
         if (DialogSystem.Instance == null || !DialogSystem.Instance.IsOpen) return;
-        if (Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame)
-            Toggle();
+        Toggle();
     }
 
     public void Toggle()

@@ -201,6 +201,15 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Log"",
+                    ""type"": ""Button"",
+                    ""id"": ""c3d99f21-8a44-4e3b-9c77-1f4a6b52e9d0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""UseItem1"",
                     ""type"": ""Button"",
                     ""id"": ""aa000001-0000-0000-0000-000000000001"",
@@ -484,6 +493,17 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""d47a1e83-6b19-4f2c-8e05-3a9c7d1b4f66"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Log"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""bb000001-0000-0000-0000-000000000001"",
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
@@ -601,6 +621,7 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
         m_Player2D_GrabThrow = m_Player2D.FindAction("GrabThrow", throwIfNotFound: true);
         m_Player2D_Map = m_Player2D.FindAction("Map", throwIfNotFound: true);
         m_Player2D_Escape = m_Player2D.FindAction("Escape", throwIfNotFound: true);
+        m_Player2D_Log = m_Player2D.FindAction("Log", throwIfNotFound: true);
         m_Player2D_UseItem1 = m_Player2D.FindAction("UseItem1", throwIfNotFound: true);
         m_Player2D_UseItem2 = m_Player2D.FindAction("UseItem2", throwIfNotFound: true);
         m_Player2D_UseItem3 = m_Player2D.FindAction("UseItem3", throwIfNotFound: true);
@@ -700,6 +721,7 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player2D_GrabThrow;
     private readonly InputAction m_Player2D_Map;
     private readonly InputAction m_Player2D_Escape;
+    private readonly InputAction m_Player2D_Log;
     private readonly InputAction m_Player2D_UseItem1;
     private readonly InputAction m_Player2D_UseItem2;
     private readonly InputAction m_Player2D_UseItem3;
@@ -762,6 +784,10 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player2D/Escape".
         /// </summary>
         public InputAction @Escape => m_Wrapper.m_Player2D_Escape;
+        /// <summary>
+        /// Provides access to the underlying input action "Player2D/Log".
+        /// </summary>
+        public InputAction @Log => m_Wrapper.m_Player2D_Log;
         /// <summary>
         /// Provides access to the underlying input action "Player2D/UseItem1".
         /// </summary>
@@ -836,6 +862,9 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
             @Escape.started += instance.OnEscape;
             @Escape.performed += instance.OnEscape;
             @Escape.canceled += instance.OnEscape;
+            @Log.started += instance.OnLog;
+            @Log.performed += instance.OnLog;
+            @Log.canceled += instance.OnLog;
             @UseItem1.started += instance.OnUseItem1;
             @UseItem1.performed += instance.OnUseItem1;
             @UseItem1.canceled += instance.OnUseItem1;
@@ -892,6 +921,9 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
             @Escape.started -= instance.OnEscape;
             @Escape.performed -= instance.OnEscape;
             @Escape.canceled -= instance.OnEscape;
+            @Log.started -= instance.OnLog;
+            @Log.performed -= instance.OnLog;
+            @Log.canceled -= instance.OnLog;
             @UseItem1.started -= instance.OnUseItem1;
             @UseItem1.performed -= instance.OnUseItem1;
             @UseItem1.canceled -= instance.OnUseItem1;
@@ -1147,6 +1179,13 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnEscape(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Log" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLog(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "UseItem1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
