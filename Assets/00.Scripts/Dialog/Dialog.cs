@@ -35,6 +35,10 @@ public class DialogLine
     [Tooltip("Which side of the screen this character stands on.")]
     public DialogSide side = DialogSide.Left;
 
+    [Tooltip("Which portrait slot on that side this line's speaker occupies (0 = first). " +
+             "Distinct slots used across the conversation are shown together, evenly spaced.")]
+    public int portraitSlot = 0;
+
     [TextArea(2, 5)]
     public string text;
 
