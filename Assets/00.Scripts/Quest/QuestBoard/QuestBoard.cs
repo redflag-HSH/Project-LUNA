@@ -13,6 +13,7 @@ public class QuestBoard : MonoBehaviour
     }
     public void Show(bool onoff)
     {
+        HUDDisplay.Instance.HUDONOFF(!onoff);
         gameObject.SetActive(onoff);
         if (onoff)
             SetUpQuestPins();

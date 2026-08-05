@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class HUDDisplay : MonoBehaviour
 {
@@ -66,9 +67,9 @@ public class HUDDisplay : MonoBehaviour
     }
 
     // ── Cutscene Animation ─────────────────────────────────────────────────────────────
-    public void Cutscene()
+    public void HUDONOFF(bool Onoff)
     {
         Animator animator = GetComponentInParent<Animator>();
-        animator.SetTrigger("Cutscene");
+        animator.SetBool("HUD", Onoff);
     }
 }

@@ -75,7 +75,7 @@ public class CutSceneTrigger : MonoBehaviour
             CameraFollow2D.Instance.StartCutscene(cutsceneVCam);
 
         if (HUDDisplay.Instance != null)
-            HUDDisplay.Instance.Cutscene();
+            HUDDisplay.Instance.HUDONOFF(false);
 
         if (director != null)
         {
@@ -89,7 +89,7 @@ public class CutSceneTrigger : MonoBehaviour
             CameraFollow2D.Instance.EndCutscene();
 
         if (HUDDisplay.Instance != null)
-            HUDDisplay.Instance.Cutscene();
+            HUDDisplay.Instance.HUDONOFF(true);
 
         if (ScreenFader.Instance != null) ScreenFader.Instance.ResetAll();
 

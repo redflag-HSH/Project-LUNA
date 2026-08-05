@@ -734,7 +734,7 @@ GameObject:
   - component: {fileID: 124022859}
   - component: {fileID: 124022858}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: messageText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -870,10 +870,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 18485950799861714, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 344029999903966865, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -998,10 +994,6 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7604722277517833977, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7718336188152344801, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -1024,12 +1016,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7785641665888899710, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
       propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8151342138110112669, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8151342138110112669, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 994098146431962568, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 934247273}
   m_SourcePrefab: {fileID: 100100000, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
 --- !u!1 &178462537
 GameObject:
@@ -4181,6 +4184,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Quests>k__BackingField: []
+--- !u!1 &934247270 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 994098146431962568, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
+  m_PrefabInstance: {fileID: 164576406}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &934247273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 934247270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &968544472
 GameObject:
   m_ObjectHideFlags: 0
