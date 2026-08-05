@@ -1,13 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// Controls the left and right character portrait SpriteRenderers.
-/// Called by DialogSystem each time a new line is shown.
+/// Controls the left and right character portraits. Called by DialogSystem each time a
+/// new line is shown.
 ///
 /// Each side supports up to MaxPortraitsPerSide simultaneous characters, addressed by
-/// DialogLine.portraitSlot. A slot is revealed the first time its side/slot speaks and
-/// stays visible (dimmed) afterward; whichever slots are currently revealed on a side are
-/// laid out evenly spaced, centered on that side's original Inspector-placed position.
+/// DialogLine.portraitSlot. A slot's SpriteRenderer is instantiated from portraitPrefab
+/// the first time its side/slot speaks, and destroyed when the conversation closes.
+/// Whichever slots are currently revealed on a side are laid out evenly spaced, centered
+/// on that side's anchor position.
 /// </summary>
 [RequireComponent(typeof(Camera))]
 public class DialogIlust : MonoBehaviour
@@ -19,10 +20,13 @@ public class DialogIlust : MonoBehaviour
     void Awake() => cam = GetComponent<Camera>();
 
     [Header("Portraits")]
-    [Tooltip("Up to 3 SpriteRenderers for the left side. Slot 0's starting position is the group's anchor.")]
-    [SerializeField] SpriteRenderer[] portraitsLeft = new SpriteRenderer[MaxPortraitsPerSide];
-    [Tooltip("Up to 3 SpriteRenderers for the right side. Slot 0's starting position is the group's anchor.")]
-    [SerializeField] SpriteRenderer[] portraitsRight = new SpriteRenderer[MaxPortraitsPerSide];
+    [Tooltip("Prefab with a SpriteRenderer on its root. One instance is spawned per revealed slot.")]
+    [SerializeField] GameObject portraitPrefab;
+
+    [Tooltip("Local position the left side's portrait group is centered on.")]
+    [SerializeField] Vector3 leftAnchor = new(-4f, 0f, 0f);
+    [Tooltip("Local position the right side's portrait group is centered on.")]
+    [SerializeField] Vector3 rightAnchor = new(4f, 0f, 0f);
 
     [Tooltip("Horizontal distance between adjacent portraits when more than one is revealed on the same side.")]
     [SerializeField] float portraitSpacing = 2.5f;
@@ -31,20 +35,14 @@ public class DialogIlust : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] float dimmedAlpha = 0.45f;
 
-    Vector3 leftAnchor;
-    Vector3 rightAnchor;
-    readonly bool[] leftRevealed = new bool[MaxPortraitsPerSide];
-    readonly bool[] rightRevealed = new bool[MaxPortraitsPerSide];
+    // null = slot not yet revealed this conversation.
+    readonly SpriteRenderer[] leftPortraits = new SpriteRenderer[MaxPortraitsPerSide];
+    readonly SpriteRenderer[] rightPortraits = new SpriteRenderer[MaxPortraitsPerSide];
+
+    bool isShowing;
 
     void Start()
     {
-        leftAnchor = portraitsLeft.Length > 0 && portraitsLeft[0] != null
-            ? portraitsLeft[0].transform.localPosition : Vector3.zero;
-        rightAnchor = portraitsRight.Length > 0 && portraitsRight[0] != null
-            ? portraitsRight[0].transform.localPosition : Vector3.zero;
-
-        ResetRevealed();
-        ToggleShow();
         if (DialogSystem.Instance != null)
             DialogSystem.Instance.dialogIlust = this;
     }
@@ -53,35 +51,48 @@ public class DialogIlust : MonoBehaviour
     {
         bool leftSpeaking = line.side == DialogSide.Left;
         int slot = Mathf.Clamp(line.portraitSlot, 0, MaxPortraitsPerSide - 1);
+        SpriteRenderer[] speakingPortraits = leftSpeaking ? leftPortraits : rightPortraits;
 
-        SpriteRenderer[] speakingPortraits = leftSpeaking ? portraitsLeft : portraitsRight;
-        bool[] speakingRevealed = leftSpeaking ? leftRevealed : rightRevealed;
+        if (line.portrait != null)
+        {
+            if (speakingPortraits[slot] == null)
+                speakingPortraits[slot] = SpawnPortrait();
+            if (speakingPortraits[slot] != null)
+                speakingPortraits[slot].sprite = line.portrait;
+        }
 
-        speakingRevealed[slot] = true;
-        if (line.portrait != null && slot < speakingPortraits.Length && speakingPortraits[slot] != null)
-            speakingPortraits[slot].sprite = line.portrait;
-
-        LayoutSide(portraitsLeft, leftRevealed, leftAnchor);
-        LayoutSide(portraitsRight, rightRevealed, rightAnchor);
+        LayoutSide(leftPortraits, leftAnchor);
+        LayoutSide(rightPortraits, rightAnchor);
 
         // A speaking line with no portrait sprite hides that slot for this beat (e.g. an
         // off-screen/narration line), even if it was revealed earlier in the conversation.
         bool hideSpeakingSlot = line.portrait == null;
-        ApplyAlpha(portraitsLeft, leftRevealed, leftSpeaking ? slot : -1, leftSpeaking && hideSpeakingSlot);
-        ApplyAlpha(portraitsRight, rightRevealed, !leftSpeaking ? slot : -1, !leftSpeaking && hideSpeakingSlot);
+        ApplyAlpha(leftPortraits, leftSpeaking ? slot : -1, leftSpeaking && hideSpeakingSlot);
+        ApplyAlpha(rightPortraits, !leftSpeaking ? slot : -1, !leftSpeaking && hideSpeakingSlot);
+    }
+
+    SpriteRenderer SpawnPortrait()
+    {
+        if (portraitPrefab == null) return null;
+        var go = Instantiate(portraitPrefab, transform);
+        if (go.TryGetComponent<SpriteRenderer>(out var sr)) return sr;
+
+        Debug.LogError("[DialogIlust] portraitPrefab has no SpriteRenderer on its root.", go);
+        Destroy(go);
+        return null;
     }
 
     /// <summary>Evenly spaces every currently-revealed portrait on a side, centered on its anchor.</summary>
-    void LayoutSide(SpriteRenderer[] portraits, bool[] revealed, Vector3 anchor)
+    void LayoutSide(SpriteRenderer[] portraits, Vector3 anchor)
     {
         int count = 0;
         for (int i = 0; i < portraits.Length; i++)
-            if (revealed[i] && portraits[i] != null) count++;
+            if (portraits[i] != null) count++;
 
         int rank = 0;
         for (int i = 0; i < portraits.Length; i++)
         {
-            if (!revealed[i] || portraits[i] == null) continue;
+            if (portraits[i] == null) continue;
             Vector3 pos = anchor;
             pos.x += (rank - (count - 1) / 2f) * portraitSpacing;
             portraits[i].transform.localPosition = pos;
@@ -89,27 +100,13 @@ public class DialogIlust : MonoBehaviour
         }
     }
 
-    void ApplyAlpha(SpriteRenderer[] portraits, bool[] revealed, int speakingSlot, bool hideSpeakingSlot)
+    void ApplyAlpha(SpriteRenderer[] portraits, int speakingSlot, bool hideSpeakingSlot)
     {
         for (int i = 0; i < portraits.Length; i++)
         {
             if (portraits[i] == null) continue;
-
-            float alpha;
-            if (!revealed[i]) alpha = 0f;
-            else if (i == speakingSlot) alpha = hideSpeakingSlot ? 0f : 1f;
-            else alpha = dimmedAlpha;
-
+            float alpha = i == speakingSlot ? (hideSpeakingSlot ? 0f : 1f) : dimmedAlpha;
             SetAlpha(portraits[i], alpha);
-        }
-    }
-
-    void ResetRevealed()
-    {
-        for (int i = 0; i < MaxPortraitsPerSide; i++)
-        {
-            leftRevealed[i] = false;
-            rightRevealed[i] = false;
         }
     }
 
@@ -131,22 +128,23 @@ public class DialogIlust : MonoBehaviour
         sr.color = c;
     }
 
+    /// <summary>Toggles between conversation-open and conversation-closed. On close, every
+    /// spawned portrait is destroyed so the next conversation starts fresh.</summary>
     public void ToggleShow()
     {
-        bool isActive = portraitsLeft.Length > 0 && portraitsLeft[0] != null && portraitsLeft[0].gameObject.activeSelf;
-        SetActiveAll(portraitsLeft, !isActive);
-        SetActiveAll(portraitsRight, !isActive);
+        isShowing = !isShowing;
+        if (isShowing) return;
 
-        if (!isActive) return;
-
-        ResetRevealed();
-        ApplyAlpha(portraitsLeft, leftRevealed, -1, false);
-        ApplyAlpha(portraitsRight, rightRevealed, -1, false);
+        ClearSide(leftPortraits);
+        ClearSide(rightPortraits);
     }
 
-    static void SetActiveAll(SpriteRenderer[] portraits, bool active)
+    void ClearSide(SpriteRenderer[] portraits)
     {
-        foreach (var p in portraits)
-            if (p != null) p.gameObject.SetActive(active);
+        for (int i = 0; i < portraits.Length; i++)
+        {
+            if (portraits[i] != null) Destroy(portraits[i].gameObject);
+            portraits[i] = null;
+        }
     }
 }
