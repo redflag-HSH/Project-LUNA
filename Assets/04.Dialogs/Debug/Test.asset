@@ -12,16 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e97498c6375d264d882cc4abe54bebe, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
+  dialogId: 0
   lines:
   - speakerName: "\uB124\uB85C"
     namePlateColor: {r: 0.18, g: 0.44, b: 0.8, a: 1}
     portrait: {fileID: -6135102697619162355, guid: 23e7d01f05ce44e4b8daaafa7e6c9e84, type: 3}
-    side: 0
+    side: 1
+    portraitSlot: 0
     text: "\uCB48\uC778\uC544! \uC0B0\uCC45\uAC00\uC790!"
     choices: []
   - speakerName: "\uB8E8\uB124"
     namePlateColor: {r: 0.18, g: 0.44, b: 0.8, a: 1}
     portrait: {fileID: -8255599504450383756, guid: 4cc9c12d92173cb44a4261e0bfa2b10b, type: 3}
-    side: 1
+    side: 0
+    portraitSlot: 0
     text: "\uADC0\uCC2E\uC544..."
     choices: []
+  questAction: 0
+  quest: {fileID: 0}

@@ -1,28 +1,27 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public class QuestTest : MonoBehaviour, IQuestTrigger, IInteractable
+public class QuestTest : MonoBehaviour, IInteractable
 {
-    [field: SerializeField] public QuestData Quest { get; private set; }
-
+    [field: SerializeField] public List<QuestData> Quests { get; private set; }
+    int a;
+    void Start()
+    {
+        a = 0;
+    }
     public void Interact(GameObject interactor)
     {
-        Trigger();
+        Trigger(a);
     }
 
-    public void Trigger()
+    public void Trigger(int input)
     {
-        if (QuestManager.Instance.IsActive(Quest))
-        {
-            QuestManager.Instance.CompleteQuest(Quest);
-            Debug.Log($"Quest '{Quest.text}' completed!");
-        }
-        else if (!QuestManager.Instance.IsCompleted(Quest))
-        {
-            QuestManager.Instance.AddQuest(Quest);
-            Debug.Log($"Quest '{Quest.text}' added!");
-        }
+        if (a >= Quests.Count)
+            return;
+        QuestData q = Quests[input];
+        QuestManager.Instance.AddAvailableQuest(q);
+        Debug.Log(a + "th quest accepted");
+        a++;
     }
-
-
 }

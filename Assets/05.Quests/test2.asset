@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questId: 1002
   questName: 26155
-  info:
+  info: "\uD14C\uC2A4\uD2B8 2\uBC88 \uD018\uC2A4\uD2B8"
   pinX: 3.7
   pinY: 7.6
   repeatable: 0

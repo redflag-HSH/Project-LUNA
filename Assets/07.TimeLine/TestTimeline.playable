@@ -418,7 +418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a40f1cb9d63be84ea9ff5e4ddf106d2, type: 3}
   m_Name: DialogClip
   m_EditorClassIdentifier: 
-  dialog: {fileID: 11400000, guid: e70fa1ea35bed8249bad88513533c27e, type: 2}
+  dialog: {fileID: 11400000, guid: 9460bc78a7cf9bd459df826ab044f732, type: 2}
 --- !u!114 &7037377033787415232
 MonoBehaviour:
   m_ObjectHideFlags: 1

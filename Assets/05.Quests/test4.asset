@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questId: 1004
   questName: kohhvt
-  info:
+  info: "\uD14C\uC2A4\uD2B8 4\uBC88 \uD018\uC2A4"
   pinX: 4
   pinY: 5.9
   repeatable: 0

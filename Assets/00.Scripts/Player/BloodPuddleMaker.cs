@@ -13,7 +13,7 @@ public class BloodPuddleMaker : MonoBehaviour
 
     [Header("Shared Settings")]
     public LayerMask groundLayer;
-    public float     groundRayLength = 10f;
+    public float groundRayLength = 10f;
     public float puddleLifetime = 5f;
     [Range(0f, 1f)]
     public float fadeStartRatio = 0.65f;
@@ -59,7 +59,7 @@ public class BloodPuddleMaker : MonoBehaviour
         RaycastHit2D groundHit = Physics2D.Raycast(position, Vector2.down, groundRayLength, groundLayer);
         Vector2 spawnPos = groundHit.collider != null ? groundHit.point : position;
 
-        obj.transform.position = spawnPos;
+        obj.transform.position = new Vector3(spawnPos.x, spawnPos.y, 0.5f);
         obj.transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
         obj.transform.localScale = Vector3.one * scaleMultiplier * (1f + Random.Range(-scaleVariance, scaleVariance));
 

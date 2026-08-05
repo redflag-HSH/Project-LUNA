@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questId: 1001
   questName: afeggasd
-  info:
+  info: "\uD14C\uC2A4\uD2B8 1\uBC88 \uD018\uC2A4\uD2B8"
   pinX: 7.4
   pinY: 2.7
   repeatable: 0

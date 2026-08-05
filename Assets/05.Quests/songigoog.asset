@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: songigoog
   m_EditorClassIdentifier: 
   questId: 1
-  questName: sungigoog is wanting you
-  info:
+  questName: "\uC120\uC9C0\uAD6D \uC544\uC8FC\uBA38\uB2C8\uC758 \uBD80\uD0C1"
+  info: "\uC120\uC9C0\uAD6D \uD018\uC2A4\uD2B8"
   pinX: 5
   pinY: 5
+  repeatable: 0

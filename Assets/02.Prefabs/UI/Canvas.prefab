@@ -2645,16 +2645,15 @@ MonoBehaviour:
   nameText: {fileID: 3572152860754952668}
   bodyText: {fileID: 3408884041932009918}
   charsPerSecond: 40
+  fastForwardAdvanceDelay: 0.15
   choiceContainer: {fileID: 321530451775099606}
   choiceButtonPrefab: {fileID: 6759340781328506669, guid: ef011939c5f6b0b4795fe2526574548c, type: 3}
   dialogRegistry:
-  - {fileID: 11400000, guid: cc394e5b44f2ad649a61c18506655e5e, type: 2}
-  - {fileID: 11400000, guid: 167069abd6c65e5489ec376e1cf8ecdd, type: 2}
   - {fileID: 11400000, guid: 7d1bc9dd00f110f458140a7d51bab883, type: 2}
-  - {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
-  - {fileID: 11400000, guid: e70fa1ea35bed8249bad88513533c27e, type: 2}
-  - {fileID: 11400000, guid: 1684779220fa844499735282855cdfc7, type: 2}
   - {fileID: 11400000, guid: 2288d8efcf65f1644ad49ad8752dfe35, type: 2}
+  - {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
+  - {fileID: 11400000, guid: 1684779220fa844499735282855cdfc7, type: 2}
+  - {fileID: 11400000, guid: 9460bc78a7cf9bd459df826ab044f732, type: 2}
 --- !u!114 &6471581429212289804
 MonoBehaviour:
   m_ObjectHideFlags: 0
