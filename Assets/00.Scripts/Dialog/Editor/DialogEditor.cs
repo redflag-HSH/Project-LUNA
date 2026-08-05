@@ -31,6 +31,7 @@ public class DialogEditor : EditorWindow
         public Color      namePlateColor = new Color(0.18f, 0.44f, 0.80f, 1f);
         public Sprite     portrait       = null;
         public DialogSide side           = DialogSide.Left;
+        public int        portraitSlot   = 0;
         public string     text           = "";
         public bool       choicesFoldout = false;
         public List<ChoiceData> choices  = new();
@@ -199,6 +200,8 @@ public class DialogEditor : EditorWindow
             EditorGUILayout.BeginHorizontal();
             line.portrait = (Sprite)EditorGUILayout.ObjectField("Portrait", line.portrait, typeof(Sprite), false);
             line.side     = (DialogSide)EditorGUILayout.EnumPopup(GUIContent.none, line.side, GUILayout.Width(60));
+            EditorGUILayout.LabelField(new GUIContent("Slot", "Which portrait position on that side (0-2). Matches DialogIlust.MaxPortraitsPerSide."), GUILayout.Width(30));
+            line.portraitSlot = Mathf.Clamp(EditorGUILayout.IntField(line.portraitSlot, GUILayout.Width(30)), 0, 2);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.LabelField("Text");
@@ -214,7 +217,7 @@ public class DialogEditor : EditorWindow
         if (GUILayout.Button("+ Add Line", GUILayout.Height(26)))
         {
             var prev = lines[lines.Count - 1];
-            lines.Add(new LineData { speakerName = prev.speakerName, namePlateColor = prev.namePlateColor, side = prev.side });
+            lines.Add(new LineData { speakerName = prev.speakerName, namePlateColor = prev.namePlateColor, side = prev.side, portraitSlot = prev.portraitSlot });
         }
     }
 
@@ -392,7 +395,7 @@ public class DialogEditor : EditorWindow
                         GUI.backgroundColor = prev;
                     }
 
-                    EditorGUILayout.LabelField(l.side.ToString(), EditorStyles.miniLabel, GUILayout.Width(36));
+                    EditorGUILayout.LabelField($"{l.side} #{l.portraitSlot}", EditorStyles.miniLabel, GUILayout.Width(56));
                     EditorGUILayout.EndHorizontal();
 
                     EditorGUILayout.LabelField(l.text, EditorStyles.wordWrappedLabel);
@@ -508,6 +511,7 @@ public class DialogEditor : EditorWindow
                     namePlateColor = src.namePlateColor,
                     portrait       = src.portrait,
                     side           = src.side,
+                    portraitSlot   = src.portraitSlot,
                     text           = src.text
                 };
                 if (src.choices != null)
@@ -572,6 +576,7 @@ public class DialogEditor : EditorWindow
                 namePlateColor = src.namePlateColor,
                 portrait       = src.portrait,
                 side           = src.side,
+                portraitSlot   = src.portraitSlot,
                 text           = src.text,
                 choices        = new DialogChoice[src.choices.Count]
             };
