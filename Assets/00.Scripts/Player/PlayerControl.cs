@@ -1364,9 +1364,6 @@ public class PlayerControl : MonoBehaviour, IDamageable
         if (stunDuration > 0f)
             TryApplyStun(stunDuration * ArmStunMultiplier);
 
-        if (isAttacking)
-            SlayRandomBodyPart();
-
         if (CurrentHp <= 1f && !_berserkerUsed)
         {
             ActivateBerserker();
