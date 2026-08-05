@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class QuestPin : DialogTrigger
+public class QuestPin : MonoBehaviour
 {
     [Tooltip("Quest this pin represents. Set by QuestBoard when the pin is spawned.")]
     public QuestData quest;
@@ -18,13 +18,7 @@ public class QuestPin : DialogTrigger
 
     public void PinClicked()
     {
-        if (DialogSystem.Instance == null) return;
-
-        if (DialogSystem.Instance.IsOpen)
-            DialogSystem.Instance.Advance();
-        else
-            // The quest board disabled input and stays open after this dialog —
-            // it re-enables input itself when closed (Show(false)).
-            DialogSystem.Instance.Open(SelectDialog(), restoreInput: false);
+        if (QuestAcceptPanel.Instance != null)
+            QuestAcceptPanel.Instance.Show(quest);
     }
 }

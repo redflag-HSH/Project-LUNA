@@ -60,7 +60,7 @@ public class HUDDisplay : MonoBehaviour
             {
                 bool done = QuestManager.Instance.IsCompleted(quest);
                 string tag = done ? "<sprite name=\"checked\">" : "<sprite name=\"unchecked\">";
-                label.text = $"{tag} {quest.text}";
+                label.text = $"{tag} {quest.questName}";
             }
         }
     }

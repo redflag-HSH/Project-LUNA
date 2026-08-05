@@ -54,7 +54,7 @@ public class DialogLine
 [CreateAssetMenu(fileName = "NewDialog", menuName = "Dialog/Dialog")]
 public class Dialog : ScriptableObject
 {
-    [Tooltip("Unique id for runtime lookup (e.g. QuestData.dialogID). Must be registered in DialogSystem's registry.")]
+    [Tooltip("Unique id for runtime lookup via DialogSystem.GetDialogById. Must be registered in DialogSystem's registry.")]
     public int dialogId;
 
     public DialogLine[] lines;

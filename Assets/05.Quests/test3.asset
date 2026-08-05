@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cbd7bacf41d54a4e91492a90f35b3ad, type: 3}
-  m_Name: songigoog
+  m_Name: test3
   m_EditorClassIdentifier: 
-  questId: 1
-  questName: sungigoog is wanting you
+  questId: 1003
+  questName: bioljgerds
   info:
-  pinX: 5
-  pinY: 5
+  pinX: 2.4
+  pinY: 2.2
+  repeatable: 0

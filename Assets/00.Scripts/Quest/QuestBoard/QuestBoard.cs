@@ -41,7 +41,6 @@ public class QuestBoard : MonoBehaviour
             float y = (q.pinY / 10f - 0.5f) * boardRect.height;
             ig.GetComponent<RectTransform>().localPosition = new Vector2(x, y);
             pin.quest = q;
-            pin.dialog = DialogSystem.Instance != null ? DialogSystem.Instance.GetDialogById(q.dialogID) : null;
         }
     }
 }

@@ -65,7 +65,7 @@ public class DialogSystem : MonoBehaviour
     public GameObject choiceButtonPrefab;
 
     [Header("Registry")]
-    [Tooltip("All Dialog assets that need to be found by id at runtime (e.g. from QuestData.dialogID).")]
+    [Tooltip("All Dialog assets that need to be found by id at runtime via GetDialogById.")]
     [SerializeField] Dialog[] dialogRegistry;
 
     public bool IsOpen { get; private set; }

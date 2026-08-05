@@ -112,7 +112,7 @@ public class DialogEditor : EditorWindow
         EditorGUILayout.BeginHorizontal();
         EditorGUI.BeginChangeCheck();
         dialogId = EditorGUILayout.IntField(
-            new GUIContent("Dialog ID", "Runtime lookup id (e.g. QuestData.dialogID). Must be unique."),
+            new GUIContent("Dialog ID", "Runtime lookup id, e.g. for DialogSystem.GetDialogById. Must be unique."),
             dialogId);
         if (EditorGUI.EndChangeCheck()) duplicateIdOwner = FindDialogWithId(dialogId, fileName, subFolder);
         if (GUILayout.Button(new GUIContent("Next Free", "Pick the lowest unused id."), GUILayout.Width(72)))
