@@ -1,18 +1,19 @@
-using System.Text;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
 /// Simple backlog panel — shows the last 30 dialog lines seen this session
-/// (DialogSystem.History) in one scrollable text block.
+/// (DialogSystem.History), one row per entry.
 ///
 /// UI hierarchy to build in the Inspector:
 ///   LogPanel
 ///   └─ Scroll View (ScrollRect)
 ///      └─ Viewport
-///         └─ Content
-///            └─ LogText (TextMeshProUGUI, with a ContentSizeFitter so it grows with the text)
+///         └─ Content (assign as `logContainer` — needs a layout group, e.g.
+///                      Vertical Layout Group + ContentSizeFitter, so rows stack)
+///
+/// Entry prefab (assign as `logEntryPrefab`) needs a DialogLogEntryView on its
+/// root, with a name text and a content text.
 ///
 /// Opened/closed via the Log action (2DActions/Player2D/Log, bound to the L key, only
 /// while a dialog is open) or by right-clicking the dialog box — see DialogBoxLogTrigger,
@@ -25,8 +26,11 @@ public class DialogLogScreen : MonoBehaviour
     [Header("Panel")]
     public GameObject logPanel;
 
-    [Header("Text")]
-    public TextMeshProUGUI logText;
+    [Header("Entries")]
+    [Tooltip("Parent the entry rows are instantiated into, e.g. the Scroll View's Content.")]
+    public Transform logContainer;
+    [Tooltip("Prefab with a DialogLogEntryView on its root.")]
+    public GameObject logEntryPrefab;
 
     public bool IsOpen { get; private set; }
 
@@ -85,17 +89,18 @@ public class DialogLogScreen : MonoBehaviour
 
     void RefreshLog()
     {
-        if (logText == null || DialogSystem.Instance == null) return;
+        if (logContainer == null || logEntryPrefab == null || DialogSystem.Instance == null) return;
 
-        var sb = new StringBuilder();
+        for (int i = logContainer.childCount - 1; i >= 0; i--)
+            Destroy(logContainer.GetChild(i).gameObject);
+
         foreach (var entry in DialogSystem.Instance.History)
         {
-            if (!string.IsNullOrWhiteSpace(entry.speakerName))
-                sb.Append(entry.speakerName).Append(": ");
-            sb.AppendLine(entry.text);
-            sb.AppendLine();
+            var go = Instantiate(logEntryPrefab, logContainer);
+            if (go.TryGetComponent<DialogLogEntryView>(out var view))
+                view.Setup(entry.speakerName, entry.text);
+            else
+                Debug.LogError("[DialogLogScreen] Log entry prefab has no DialogLogEntryView on its root — the row will be blank.", go);
         }
-
-        logText.text = sb.ToString();
     }
 }
