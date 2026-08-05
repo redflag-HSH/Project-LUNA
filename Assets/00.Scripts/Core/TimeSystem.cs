@@ -13,6 +13,12 @@ public class TimeSystem : MonoBehaviour
     public int Hour => _hour;
     public int Min => _min;
 
+    // ── Weather ───────────────────────────────────────────────────────────────
+
+    public bool IsRaining { get; private set; }
+
+    public void SetRaining(bool raining) => IsRaining = raining;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }

@@ -37,6 +37,9 @@ public class PlayerDebuffer : MonoBehaviour
     void Update()
     {
         int hour = TimeSystem.Instance != null ? TimeSystem.Instance.Hour : dayStartHour;
-        IsDaytime = hour >= dayStartHour && hour < nightStartHour;
+        bool isRaining = TimeSystem.Instance != null && TimeSystem.Instance.IsRaining;
+
+        // Rain forces night-time effects even during the day.
+        IsDaytime = !isRaining && hour >= dayStartHour && hour < nightStartHour;
     }
 }
