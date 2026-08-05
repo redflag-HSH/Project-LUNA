@@ -23,10 +23,17 @@ public class DialogIlust : MonoBehaviour
     [Tooltip("Prefab with a SpriteRenderer on its root. One instance is spawned per revealed slot.")]
     [SerializeField] GameObject portraitPrefab;
 
-    [Tooltip("Local position the left side's portrait group is centered on.")]
-    [SerializeField] Vector3 leftAnchor = new(-4f, 0f, 0f);
-    [Tooltip("Local position the right side's portrait group is centered on.")]
-    [SerializeField] Vector3 rightAnchor = new(4f, 0f, 0f);
+    [Header("Anchor Layout")]
+    [Tooltip("Horizontal anchor position as a fraction of the camera's half-width from center (0 = center, 1 = edge of frame).")]
+    [Range(0f, 1f)]
+    [SerializeField] float horizontalAnchorRatio = 0.6f;
+
+    [Tooltip("Vertical anchor position as a fraction of the camera's half-height from center (-1 = bottom, 1 = top).")]
+    [Range(-1f, 1f)]
+    [SerializeField] float verticalAnchorRatio = 0f;
+
+    [Tooltip("Local Z offset for spawned portraits (render depth relative to the camera).")]
+    [SerializeField] float anchorDepth = 1.1f;
 
     [Tooltip("Horizontal distance between adjacent portraits when more than one is revealed on the same side.")]
     [SerializeField] float portraitSpacing = 2.5f;
@@ -61,8 +68,8 @@ public class DialogIlust : MonoBehaviour
                 speakingPortraits[slot].sprite = line.portrait;
         }
 
-        LayoutSide(leftPortraits, leftAnchor);
-        LayoutSide(rightPortraits, rightAnchor);
+        LayoutSide(leftPortraits, ComputeAnchor(-1));
+        LayoutSide(rightPortraits, ComputeAnchor(1));
 
         // A speaking line with no portrait sprite hides that slot for this beat (e.g. an
         // off-screen/narration line), even if it was revealed earlier in the conversation.
@@ -80,6 +87,16 @@ public class DialogIlust : MonoBehaviour
         Debug.LogError("[DialogIlust] portraitPrefab has no SpriteRenderer on its root.", go);
         Destroy(go);
         return null;
+    }
+
+    /// <summary>Derives a side's anchor from the camera's current orthographic size/aspect,
+    /// so layout stays correctly framed regardless of camera size or aspect ratio.</summary>
+    /// <param name="sideSign">-1 for the left side, +1 for the right side.</param>
+    Vector3 ComputeAnchor(int sideSign)
+    {
+        float halfHeight = cam != null ? cam.orthographicSize : 5f;
+        float halfWidth = cam != null ? halfHeight * cam.aspect : halfHeight;
+        return new Vector3(sideSign * halfWidth * horizontalAnchorRatio, halfHeight * verticalAnchorRatio, anchorDepth);
     }
 
     /// <summary>Evenly spaces every currently-revealed portrait on a side, centered on its anchor.</summary>
