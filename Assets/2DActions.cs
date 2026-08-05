@@ -219,6 +219,15 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""DialogSkip"",
+                    ""type"": ""Button"",
+                    ""id"": ""e2b3c4d5-6f70-4a81-9b0c-1d2e3f4a5b6c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""UseItem1"",
                     ""type"": ""Button"",
                     ""id"": ""aa000001-0000-0000-0000-000000000001"",
@@ -524,6 +533,17 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""b0a9c8d7-2f3e-4b4c-8d1e-6f7a8b9c0d1e"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""DialogSkip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""bb000001-0000-0000-0000-000000000001"",
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
@@ -643,6 +663,7 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
         m_Player2D_Escape = m_Player2D.FindAction("Escape", throwIfNotFound: true);
         m_Player2D_Log = m_Player2D.FindAction("Log", throwIfNotFound: true);
         m_Player2D_DialogFastForward = m_Player2D.FindAction("DialogFastForward", throwIfNotFound: true);
+        m_Player2D_DialogSkip = m_Player2D.FindAction("DialogSkip", throwIfNotFound: true);
         m_Player2D_UseItem1 = m_Player2D.FindAction("UseItem1", throwIfNotFound: true);
         m_Player2D_UseItem2 = m_Player2D.FindAction("UseItem2", throwIfNotFound: true);
         m_Player2D_UseItem3 = m_Player2D.FindAction("UseItem3", throwIfNotFound: true);
@@ -744,6 +765,7 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player2D_Escape;
     private readonly InputAction m_Player2D_Log;
     private readonly InputAction m_Player2D_DialogFastForward;
+    private readonly InputAction m_Player2D_DialogSkip;
     private readonly InputAction m_Player2D_UseItem1;
     private readonly InputAction m_Player2D_UseItem2;
     private readonly InputAction m_Player2D_UseItem3;
@@ -814,6 +836,10 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player2D/DialogFastForward".
         /// </summary>
         public InputAction @DialogFastForward => m_Wrapper.m_Player2D_DialogFastForward;
+        /// <summary>
+        /// Provides access to the underlying input action "Player2D/DialogSkip".
+        /// </summary>
+        public InputAction @DialogSkip => m_Wrapper.m_Player2D_DialogSkip;
         /// <summary>
         /// Provides access to the underlying input action "Player2D/UseItem1".
         /// </summary>
@@ -894,6 +920,9 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
             @DialogFastForward.started += instance.OnDialogFastForward;
             @DialogFastForward.performed += instance.OnDialogFastForward;
             @DialogFastForward.canceled += instance.OnDialogFastForward;
+            @DialogSkip.started += instance.OnDialogSkip;
+            @DialogSkip.performed += instance.OnDialogSkip;
+            @DialogSkip.canceled += instance.OnDialogSkip;
             @UseItem1.started += instance.OnUseItem1;
             @UseItem1.performed += instance.OnUseItem1;
             @UseItem1.canceled += instance.OnUseItem1;
@@ -956,6 +985,9 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
             @DialogFastForward.started -= instance.OnDialogFastForward;
             @DialogFastForward.performed -= instance.OnDialogFastForward;
             @DialogFastForward.canceled -= instance.OnDialogFastForward;
+            @DialogSkip.started -= instance.OnDialogSkip;
+            @DialogSkip.performed -= instance.OnDialogSkip;
+            @DialogSkip.canceled -= instance.OnDialogSkip;
             @UseItem1.started -= instance.OnUseItem1;
             @UseItem1.performed -= instance.OnUseItem1;
             @UseItem1.canceled -= instance.OnUseItem1;
@@ -1225,6 +1257,13 @@ public partial class @_2DActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDialogFastForward(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DialogSkip" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDialogSkip(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "UseItem1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

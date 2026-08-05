@@ -105,11 +105,15 @@ public class DialogSystem : MonoBehaviour
     void OnEnable()
     {
         actions.Player2D.DialogFastForward.Enable();
+        actions.Player2D.DialogSkip.Enable();
+        actions.Player2D.DialogSkip.performed += OnDialogSkipPressed;
     }
 
     void OnDisable()
     {
+        actions.Player2D.DialogSkip.performed -= OnDialogSkipPressed;
         actions.Player2D.DialogFastForward.Disable();
+        actions.Player2D.DialogSkip.Disable();
     }
 
     void OnDestroy()
@@ -232,6 +236,38 @@ public class DialogSystem : MonoBehaviour
         else
             Close();
     }
+
+    /// <summary>Instantly skips through remaining lines until a choice prompt or the end of the dialog.</summary>
+    public void SkipToChoiceOrEnd()
+    {
+        if (!IsOpen || isShowingChoices) return;
+        if (DialogLogScreen.Instance != null && DialogLogScreen.Instance.IsOpen) return;
+
+        if (isTyping) SkipTypewriter();
+
+        while (true)
+        {
+            DialogLine line = current.lines[lineIndex];
+            if (line.choices != null && line.choices.Length > 0)
+            {
+                ShowChoices(line.choices);
+                return;
+            }
+
+            lineIndex++;
+            if (lineIndex >= current.lines.Length)
+            {
+                Close();
+                return;
+            }
+
+            ShowLine(lineIndex);
+            if (!IsOpen) return; // ShowLine closed the dialog (blank terminator line)
+            if (isTyping) SkipTypewriter();
+        }
+    }
+
+    void OnDialogSkipPressed(InputAction.CallbackContext ctx) => SkipToChoiceOrEnd();
 
     public void Close()
     {
