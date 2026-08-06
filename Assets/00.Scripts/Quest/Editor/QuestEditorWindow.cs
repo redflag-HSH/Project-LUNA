@@ -144,6 +144,9 @@ public class QuestEditorWindow : EditorWindow
         EditorGUILayout.Space(4);
         EditorGUILayout.LabelField($"Pin Position: ({_selected.pinX:0.##}, {_selected.pinY:0.##})", EditorStyles.miniLabel);
         EditorGUILayout.LabelField(_selected.repeatable ? "Repeatable: yes" : "Repeatable: no (one-time)", EditorStyles.miniLabel);
+
+        EditorGUILayout.Space(10);
+        DrawObjectives();
         EditorGUILayout.Space(10);
 
         EditorGUILayout.BeginHorizontal();
@@ -166,6 +169,101 @@ public class QuestEditorWindow : EditorWindow
         }
 
         EditorGUILayout.EndHorizontal();
+    }
+
+    void DrawObjectives()
+    {
+        EditorGUILayout.LabelField("Objectives", EditorStyles.boldLabel);
+
+        var objectives = new List<QuestObjective>(_selected.objectives ?? System.Array.Empty<QuestObjective>());
+        int removeIndex = -1;
+        bool changed = false;
+
+        for (int i = 0; i < objectives.Count; i++)
+        {
+            var obj = objectives[i];
+            EditorGUILayout.BeginVertical(GUI.skin.box);
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField($"#{i}", GUILayout.Width(20));
+            string newId = EditorGUILayout.TextField(obj.objectiveId);
+            if (newId != obj.objectiveId) { obj.objectiveId = newId; changed = true; }
+            if (GUILayout.Button("×", GUILayout.Width(22))) removeIndex = i;
+            EditorGUILayout.EndHorizontal();
+
+            string newDesc = EditorGUILayout.TextField("Description", obj.description);
+            if (newDesc != obj.description) { obj.description = newDesc; changed = true; }
+
+            var newType = (QuestObjectiveType)EditorGUILayout.EnumPopup("Type", obj.type);
+            if (newType != obj.type) { obj.type = newType; changed = true; }
+
+            if (obj.type != QuestObjectiveType.Manual)
+            {
+                string targetLabel = obj.type switch
+                {
+                    QuestObjectiveType.KillCount => "Monster Id",
+                    QuestObjectiveType.CollectItem => "Item Code / Name",
+                    QuestObjectiveType.ReachLocation => "Location Id",
+                    QuestObjectiveType.WinBattle => "Battle Id",
+                    _ => "Target Id",
+                };
+                string newTarget = EditorGUILayout.TextField(targetLabel, obj.targetId);
+                if (newTarget != obj.targetId) { obj.targetId = newTarget; changed = true; }
+            }
+
+            if (obj.type == QuestObjectiveType.KillCount || obj.type == QuestObjectiveType.CollectItem)
+            {
+                int newCount = EditorGUILayout.IntField("Required Count", obj.requiredCount);
+                newCount = Mathf.Max(1, newCount);
+                if (newCount != obj.requiredCount) { obj.requiredCount = newCount; changed = true; }
+            }
+
+            string prereqJoined = obj.prerequisiteObjectiveIds != null ? string.Join(", ", obj.prerequisiteObjectiveIds) : "";
+            string newPrereq = EditorGUILayout.TextField(
+                new GUIContent("Prerequisites", "Comma-separated objective ids that must complete before this one can progress."),
+                prereqJoined);
+            if (newPrereq != prereqJoined)
+            {
+                obj.prerequisiteObjectiveIds = string.IsNullOrWhiteSpace(newPrereq)
+                    ? System.Array.Empty<string>()
+                    : System.Array.ConvertAll(newPrereq.Split(','), s => s.Trim());
+                changed = true;
+            }
+
+            bool newOptional = EditorGUILayout.Toggle(
+                new GUIContent("Optional", "If on, this objective doesn't block quest completion."), obj.optional);
+            if (newOptional != obj.optional) { obj.optional = newOptional; changed = true; }
+
+            bool newCompletesQuest = EditorGUILayout.Toggle(
+                new GUIContent("Completes Quest", "If on, finishing this objective alone completes the whole quest (branch / alternate ending)."),
+                obj.completesQuest);
+            if (newCompletesQuest != obj.completesQuest) { obj.completesQuest = newCompletesQuest; changed = true; }
+
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space(2);
+        }
+
+        if (objectives.Count == 0)
+            EditorGUILayout.HelpBox("No objectives yet.", MessageType.None);
+
+        if (removeIndex >= 0)
+        {
+            objectives.RemoveAt(removeIndex);
+            changed = true;
+        }
+
+        if (GUILayout.Button("+ Add Objective"))
+        {
+            objectives.Add(new QuestObjective { objectiveId = $"objective_{objectives.Count}", requiredCount = 1 });
+            changed = true;
+        }
+
+        if (changed)
+        {
+            _selected.objectives = objectives.ToArray();
+            EditorUtility.SetDirty(_selected);
+            AssetDatabase.SaveAssetIfDirty(_selected);
+        }
     }
 
     void DrawCreateForm()
