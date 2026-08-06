@@ -18,6 +18,7 @@ public class DialogEditor : EditorWindow
 
     DialogQuestAction questAction = DialogQuestAction.None;
     QuestData         quest;
+    string            questObjectiveId;
 
     class ChoiceData
     {
@@ -136,6 +137,13 @@ public class DialogEditor : EditorWindow
             quest = (QuestData)EditorGUILayout.ObjectField("Quest", quest, typeof(QuestData), false);
             if (quest == null)
                 EditorGUILayout.HelpBox("Assign a quest, or the action does nothing.", MessageType.Warning);
+
+            if (questAction == DialogQuestAction.CompleteObjective)
+            {
+                questObjectiveId = EditorGUILayout.TextField("Objective Id", questObjectiveId);
+                if (string.IsNullOrEmpty(questObjectiveId))
+                    EditorGUILayout.HelpBox("Enter the objective id to complete, or the action does nothing.", MessageType.Warning);
+            }
         }
 
         EditorGUILayout.BeginHorizontal();
@@ -354,8 +362,9 @@ public class DialogEditor : EditorWindow
             EditorGUILayout.LabelField($"ID: {selectedDialog.dialogId}", EditorStyles.miniLabel, GUILayout.Width(60));
             if (selectedDialog.questAction != DialogQuestAction.None)
                 EditorGUILayout.LabelField(
-                    $"⚑ {selectedDialog.questAction}: {(selectedDialog.quest != null ? selectedDialog.quest.questId : "(no quest!)")}",
-                    EditorStyles.miniLabel, GUILayout.Width(180));
+                    $"⚑ {selectedDialog.questAction}: {(selectedDialog.quest != null ? selectedDialog.quest.questId : "(no quest!)")}" +
+                    (selectedDialog.questAction == DialogQuestAction.CompleteObjective ? $" / {selectedDialog.questObjectiveId}" : ""),
+                    EditorStyles.miniLabel, GUILayout.Width(220));
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("Select in Project", EditorStyles.miniButton))
             {
@@ -492,6 +501,7 @@ public class DialogEditor : EditorWindow
         duplicateIdOwner = null;
         questAction = dialog.questAction;
         quest       = dialog.quest;
+        questObjectiveId = dialog.questObjectiveId;
 
         // Restore subfolder from asset path
         string assetPath = AssetDatabase.GetAssetPath(dialog);
@@ -565,6 +575,7 @@ public class DialogEditor : EditorWindow
         asset.dialogId = dialogId;
         asset.questAction = questAction;
         asset.quest = questAction != DialogQuestAction.None ? quest : null;
+        asset.questObjectiveId = questAction == DialogQuestAction.CompleteObjective ? questObjectiveId : null;
         asset.lines = new DialogLine[lines.Count];
 
         for (int i = 0; i < lines.Count; i++)
@@ -606,6 +617,7 @@ public class DialogEditor : EditorWindow
         duplicateIdOwner = null;
         questAction = DialogQuestAction.None;
         quest     = null;
+        questObjectiveId = null;
         lines     = new List<LineData> { new LineData() };
     }
 

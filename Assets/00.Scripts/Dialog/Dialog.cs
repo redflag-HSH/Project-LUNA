@@ -5,9 +5,9 @@ public enum DialogSide { Left, Right }
 public enum DialogQuestAction
 {
     None,
-    AddAvailable,   // quest shows up on the quest board
-    AddActive,      // quest is accepted immediately (stage: TalkToClient)
-    AdvanceStage    // active quest moves to its next stage; at TalkToPygmalion this completes it
+    AddAvailable,      // quest shows up on the quest board
+    AddActive,         // quest is accepted immediately
+    CompleteObjective  // completes the objective named by questObjectiveId on the quest below
 }
 
 [System.Serializable]
@@ -64,4 +64,6 @@ public class Dialog : ScriptableObject
     public DialogQuestAction questAction = DialogQuestAction.None;
     [Tooltip("Quest handed to QuestManager when the dialog ends.")]
     public QuestData quest;
+    [Tooltip("Objective id to complete. Only used when questAction is CompleteObjective.")]
+    public string questObjectiveId;
 }

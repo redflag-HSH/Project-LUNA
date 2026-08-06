@@ -41,6 +41,10 @@ public class Inventory : MonoBehaviour
     public UnityEvent<InventorySlot> onItemRemoved;
     public UnityEvent onInventoryFull;
 
+    /// <summary>Fires alongside onItemAdded on every Inventory instance. Lets systems like
+    /// QuestManager react to item pickups without holding a reference to the player.</summary>
+    public static event System.Action<InventorySlot> OnAnyItemAdded;
+
     [Header("Debug (read-only)")]
     [SerializeField] private List<InventorySlot> slots = new();
 
@@ -65,6 +69,7 @@ public class Inventory : MonoBehaviour
         {
             existing.quantity++;
             onItemAdded.Invoke(existing);
+            OnAnyItemAdded?.Invoke(existing);
             return true;
         }
 
@@ -78,6 +83,7 @@ public class Inventory : MonoBehaviour
         InventorySlot newSlot = new(item);
         slots.Add(newSlot);
         onItemAdded.Invoke(newSlot);
+        OnAnyItemAdded?.Invoke(newSlot);
         Debug.Log($"[Inventory] Added: {item.itemName} (x{newSlot.quantity})");
         return true;
     }

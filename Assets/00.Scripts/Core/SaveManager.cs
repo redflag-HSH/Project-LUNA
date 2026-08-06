@@ -79,7 +79,7 @@ public class SaveManager : MonoBehaviour
     {
         public List<string> availableQuestIds = new();
         public List<string> activeQuestIds = new();
-        public List<int> activeQuestStages = new();   // parallel to activeQuestIds
+        public List<QuestManager.QuestProgressSave> activeQuestProgress = new();
         public List<string> completedQuestIds = new();
     }
 
@@ -387,13 +387,10 @@ public class SaveManager : MonoBehaviour
             Data.quests.availableQuestIds.Add(q.questId);
 
         Data.quests.activeQuestIds.Clear();
-        Data.quests.activeQuestStages.Clear();
         foreach (var q in qm.ActiveQuests)
-        {
             Data.quests.activeQuestIds.Add(q.questId);
-            qm.TryGetStage(q, out var stage);
-            Data.quests.activeQuestStages.Add((int)stage);
-        }
+
+        Data.quests.activeQuestProgress = qm.ExportProgress();
 
         Data.quests.completedQuestIds.Clear();
         foreach (var id in qm.CompletedQuestIds)
@@ -405,7 +402,7 @@ public class SaveManager : MonoBehaviour
         var qm = QuestManager.Instance;
         if (qm == null) return;
 
-        qm.LoadFromSave(Data.quests.availableQuestIds, Data.quests.activeQuestIds, Data.quests.completedQuestIds, Data.quests.activeQuestStages);
+        qm.LoadFromSave(Data.quests.availableQuestIds, Data.quests.activeQuestIds, Data.quests.completedQuestIds, Data.quests.activeQuestProgress);
     }
 
     private void RecordTime()

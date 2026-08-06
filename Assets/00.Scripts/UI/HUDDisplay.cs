@@ -63,6 +63,20 @@ public class HUDDisplay : MonoBehaviour
                 string tag = done ? "<sprite name=\"checked\">" : "<sprite name=\"unchecked\">";
                 label.text = $"{tag} {quest.questName}";
             }
+
+            if (quest.objectives == null) continue;
+            foreach (var objective in quest.objectives)
+            {
+                GameObject objRow = Instantiate(questLinePrefab, questLineContainer);
+                if (!objRow.TryGetComponent(out TextMeshProUGUI objLabel)) continue;
+
+                bool objDone = QuestManager.Instance.IsObjectiveComplete(quest, objective.objectiveId);
+                string objTag = objDone ? "<sprite name=\"checked\">" : "<sprite name=\"unchecked\">";
+                string progress = objective.type is QuestObjectiveType.KillCount or QuestObjectiveType.CollectItem
+                    ? $" ({Mathf.Min(QuestManager.Instance.GetObjectiveCount(quest, objective.objectiveId), objective.requiredCount)}/{objective.requiredCount})"
+                    : "";
+                objLabel.text = $"  {objTag} {objective.description}{progress}";
+            }
         }
     }
 

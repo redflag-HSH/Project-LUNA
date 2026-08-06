@@ -15,8 +15,8 @@ public class DialogTrigger : MonoBehaviour, IInteractable
         Always,             // always matches
         QuestNotStarted,    // quest is not available, active, or completed
         QuestAvailable,     // quest is on the board / offered
-        QuestActive,        // quest has been accepted (any stage)
-        QuestAtStage,       // quest is active AND at the given stage
+        QuestActive,        // quest has been accepted
+        QuestObjectiveComplete, // quest is active AND the given objective is complete
         QuestCompleted      // quest is done
     }
 
@@ -26,8 +26,8 @@ public class DialogTrigger : MonoBehaviour, IInteractable
         public DialogCondition condition = DialogCondition.Always;
         [Tooltip("Quest whose state is checked. Ignored for Always.")]
         public QuestData quest;
-        [Tooltip("Stage to match. Only used with QuestAtStage.")]
-        public QuestStage stage = QuestStage.TalkToClient;
+        [Tooltip("Objective id to check. Only used with QuestObjectiveComplete.")]
+        public string objectiveId;
         public Dialog dialog;
     }
 
@@ -68,7 +68,7 @@ public class DialogTrigger : MonoBehaviour, IInteractable
         {
             case DialogCondition.QuestAvailable: return qm.IsAvailable(entry.quest);
             case DialogCondition.QuestActive:    return qm.IsActive(entry.quest);
-            case DialogCondition.QuestAtStage:   return qm.IsAtStage(entry.quest, entry.stage);
+            case DialogCondition.QuestObjectiveComplete: return qm.IsObjectiveComplete(entry.quest, entry.objectiveId);
             case DialogCondition.QuestCompleted: return qm.IsCompleted(entry.quest);
             case DialogCondition.QuestNotStarted:
                 return !qm.IsAvailable(entry.quest) && !qm.IsActive(entry.quest) && !qm.IsCompleted(entry.quest);

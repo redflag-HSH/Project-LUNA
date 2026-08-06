@@ -209,6 +209,7 @@ public class DialogSystem : MonoBehaviour
         dialogIlust.ToggleShow();
         if (PlayerControl.Instance != null) PlayerControl.Instance.SetInputEnabled(false);
         ShowLine(0);
+        HUDDisplay.Instance.HUDONOFF(false);
     }
 
     /// <summary>Press Interact to advance. First press skips typewriter; second advances.</summary>
@@ -292,6 +293,7 @@ public class DialogSystem : MonoBehaviour
                 PlayerControl.Instance.SetInputEnabled(true);
         }
         restoreInputOnClose = true;
+        HUDDisplay.Instance.HUDONOFF(true);
     }
 
     void ApplyQuestAction(Dialog dialog)
@@ -306,8 +308,8 @@ public class DialogSystem : MonoBehaviour
         switch (dialog.questAction)
         {
             case DialogQuestAction.AddAvailable: QuestManager.Instance.AddAvailableQuest(dialog.quest); break;
-            case DialogQuestAction.AddActive:    QuestManager.Instance.AddQuest(dialog.quest); break;
-            case DialogQuestAction.AdvanceStage: QuestManager.Instance.AdvanceStage(dialog.quest); break;
+            case DialogQuestAction.AddActive: QuestManager.Instance.AddQuest(dialog.quest); break;
+            case DialogQuestAction.CompleteObjective: QuestManager.Instance.CompleteObjective(dialog.quest, dialog.questObjectiveId); break;
         }
     }
 

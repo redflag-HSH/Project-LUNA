@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     public static event Action OnGamePaused;
     public static event Action OnGameResumed;
     public static event Action OnEnemyKilled;
+    public static event Action<string> OnEnemyKilledWithId;
 
     // ──────────────────────────────────────────────────────────────
     //  Inspector
@@ -246,12 +247,15 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Call from MeleeMonster / PartSliceEnemy on death.
     /// Pass isSlice=true when the kill was delivered via EnemySliceable.
+    /// Pass monsterId to drive KillCount quest objectives for that monster.
     /// </summary>
-    public void ReportEnemyKill(bool isSlice = false)
+    public void ReportEnemyKill(string monsterId = null, bool isSlice = false)
     {
         EnemiesKilled++;
         if (isSlice) SliceKills++;
         OnEnemyKilled?.Invoke();
+        if (!string.IsNullOrEmpty(monsterId))
+            OnEnemyKilledWithId?.Invoke(monsterId);
     }
 
     /// <summary>Call from PlayerControl.TakeDamage to track cumulative damage.</summary>
