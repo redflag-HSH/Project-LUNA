@@ -1018,21 +1018,14 @@ PrefabInstance:
       propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8151342138110112669, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8151342138110112669, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
-      propertyPath: m_SizeDelta.y
+    - target: {fileID: 7826971882043136883, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
+      propertyPath: m_VertexColorAlwaysGammaSpace
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 994098146431962568, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 934247273}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
 --- !u!1 &178462537
 GameObject:
@@ -1841,7 +1834,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -0.009887695, y: 196.249}
+  m_AnchoredPosition: {x: -0.009765625, y: 196.24902}
   m_SizeDelta: {x: 0, y: 392.498}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &384592317
@@ -3011,17 +3004,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   conditionalDialogs:
+  - condition: 4
+    quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
+    objectiveId: TalkToNPC
+    dialog: {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
   - condition: 3
     quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
-    stage: 0
+    objectiveId: 
     dialog: {fileID: 11400000, guid: 2288d8efcf65f1644ad49ad8752dfe35, type: 2}
   - condition: 1
     quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
-    stage: 0
+    objectiveId: 
     dialog: {fileID: 11400000, guid: 7d1bc9dd00f110f458140a7d51bab883, type: 2}
   - condition: 0
     quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
-    stage: 0
+    objectiveId: 
     dialog: {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
   dialog: {fileID: 0}
 --- !u!61 &687339323
@@ -4184,25 +4181,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Quests>k__BackingField: []
---- !u!1 &934247270 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 994098146431962568, guid: 0f1f8039f2740a449ad3b43951d725d2, type: 3}
-  m_PrefabInstance: {fileID: 164576406}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &934247273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 934247270}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!1 &968544472
 GameObject:
   m_ObjectHideFlags: 0
@@ -7284,6 +7262,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3579899713875238336, guid: b75fb45437fed9648874e7dc0a21a37a, type: 3}
+      propertyPath: _registry.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3579899713875238336, guid: b75fb45437fed9648874e7dc0a21a37a, type: 3}
+      propertyPath: '_registry.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
     - target: {fileID: 7389473983421916428, guid: b75fb45437fed9648874e7dc0a21a37a, type: 3}
       propertyPath: m_Name
       value: Manager

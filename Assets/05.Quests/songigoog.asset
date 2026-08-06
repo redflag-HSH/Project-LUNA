@@ -15,6 +15,25 @@ MonoBehaviour:
   questId: 1
   questName: "\uC120\uC9C0\uAD6D \uC544\uC8FC\uBA38\uB2C8\uC758 \uBD80\uD0C1"
   info: "\uC120\uC9C0\uAD6D \uD018\uC2A4\uD2B8"
+  objectives:
+  - objectiveId: TalkToNPC
+    description: "\uC120\uC9C0\uAD6D \uC544\uC8FC\uBA38\uB2C8\uC5D0\uAC8C \uB9D0\uC744
+      \uAC78\uC790"
+    type: 0
+    targetId: 
+    requiredCount: 1
+    prerequisiteObjectiveIds: []
+    optional: 0
+    completesQuest: 0
+  - objectiveId: FAT
+    description: "\uB370\uD5F7 \uC0B4 \u3148\u3134 \uCA60\uB2E4"
+    type: 0
+    targetId: 
+    requiredCount: 1
+    prerequisiteObjectiveIds:
+    - TalkToNPC
+    optional: 0
+    completesQuest: 0
   pinX: 5
   pinY: 5
   repeatable: 0

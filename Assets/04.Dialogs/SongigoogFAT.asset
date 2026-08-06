@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e97498c6375d264d882cc4abe54bebe, type: 3}
-  m_Name: sungioogTalkToNPC
+  m_Name: SongigoogFAT
   m_EditorClassIdentifier: 
-  dialogId: 13
+  dialogId: 14
   lines:
   - speakerName: "\uC544\uC8FC\uBA38\uB2C8"
     namePlateColor: {r: 0.18, g: 0.44, b: 0.8, a: 1}
     portrait: {fileID: 0}
     side: 0
     portraitSlot: 0
-    text: "\uBC25\uC740 \uBA39\uACE0 \uB2E4\uB2C8\uB2C8? \uBC25\uBA39\uC73C\uB7EC
-      \uC624\uB834"
+    text: "\uC544\uC774\uACE0 \uD3EC\uB3D9\uD3EC\uB3D9\uD574\uC84C\uB124? \uB9DB\uC788\uACA0\uB2E4"
     choices: []
   questAction: 3
   quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
-  questObjectiveId: TalkToNPC
+  questObjectiveId: FAT

@@ -18,7 +18,10 @@ MonoBehaviour:
     namePlateColor: {r: 0.18, g: 0.44, b: 0.8, a: 1}
     portrait: {fileID: 0}
     side: 0
-    text: "\uC598, \uBC25\uC740 \uBA39\uACE0 \uB2E4\uB2C8\uB2C8?"
+    portraitSlot: 0
+    text: "\uC598, \uBC25\uC740 \uBA39\uACE0 \uB2E4\uB2C8\uB2C8? quest\uB294 \uB05D\uB0AC\uAC70\uB098
+      \uC548\uBC1B\uC558\uB2E8\uB2E4"
     choices: []
-  questAction: 3
+  questAction: 0
   quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
+  questObjectiveId: 
