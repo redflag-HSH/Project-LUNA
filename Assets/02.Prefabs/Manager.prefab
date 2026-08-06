@@ -101,3 +101,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _registry:
   - {fileID: 11400000, guid: 2734701c023a2f249a031fb841566521, type: 2}
+  - {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
