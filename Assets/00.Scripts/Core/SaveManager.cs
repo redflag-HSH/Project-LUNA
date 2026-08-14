@@ -94,6 +94,12 @@ public class SaveManager : MonoBehaviour
     }
 
     [Serializable]
+    public class EquipmentSaveData
+    {
+        public List<PlayerEquipment.EquippedSaveEntry> equippedItems = new();
+    }
+
+    [Serializable]
     public class QuestSaveData
     {
         public List<string> availableQuestIds = new();
@@ -111,6 +117,7 @@ public class SaveManager : MonoBehaviour
         public List<string> litBonfires = new();
         public List<InventorySlotData> inventory = new();
         public SkillLevelsData skillLevels = new();
+        public EquipmentSaveData equipment = new();
         public QuestSaveData quests = new();
         public TimeData time = new();
     }
@@ -236,6 +243,7 @@ public class SaveManager : MonoBehaviour
         RecordSession();
         RecordInventory();
         RecordSkillLevels();
+        RecordEquipment();
         RecordQuests();
         RecordTime();
         RecordLitBonfire(bonfire.BonfireId);
@@ -255,6 +263,7 @@ public class SaveManager : MonoBehaviour
         RecordSession();
         RecordInventory();
         RecordSkillLevels();
+        RecordEquipment();
         RecordQuests();
         RecordTime();
         WriteFile();
@@ -299,6 +308,7 @@ public class SaveManager : MonoBehaviour
         player.SetBloodMoney(Data.playerStats.bloodMoney);
         ApplyInventory();
         ApplySkillLevels();
+        ApplyEquipment();
         ApplyQuests();
         ApplyTime();
     }
@@ -462,6 +472,28 @@ public class SaveManager : MonoBehaviour
             magic.ApplyHeatBloodLevel(Data.skillLevels.heatBloodLevel);
             magic.ApplyColdBloodLevel(Data.skillLevels.coldBloodLevel);
         }
+    }
+
+    private PlayerEquipment GetPlayerEquipment()
+    {
+        var player = PlayerControl.Instance;
+        return player != null ? player.GetComponent<PlayerEquipment>() : null;
+    }
+
+    private void RecordEquipment()
+    {
+        var equipment = GetPlayerEquipment();
+        if (equipment == null) return;
+
+        Data.equipment.equippedItems = equipment.ExportEquipped();
+    }
+
+    private void ApplyEquipment()
+    {
+        var equipment = GetPlayerEquipment();
+        if (equipment == null) return;
+
+        equipment.LoadFromSave(Data.equipment.equippedItems);
     }
 
     private void RecordQuests()

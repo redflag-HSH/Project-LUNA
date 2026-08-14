@@ -33,6 +33,19 @@ public class PlayerBasicStatContainer : MonoBehaviour
         Instance = this;
     }
 
+    /// <summary>Overwrites the equipment-derived bonus on every basic point. Called by
+    /// PlayerEquipment whenever equipped items or their plus levels change.</summary>
+    public void SetEquipmentBonuses(int attack, int defend, int health, int stamina, int moveSpeed, int attackSpeed, int luck)
+    {
+        _plusAttackPoint = attack;
+        _plusDefendPoint = defend;
+        _plusHealthPoint = health;
+        _plusStaminaPoint = stamina;
+        _plusMoveSpeedPoint = moveSpeed;
+        _plusAttackSpeedPoint = attackSpeed;
+        _plusLuckPoint = luck;
+    }
+
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
