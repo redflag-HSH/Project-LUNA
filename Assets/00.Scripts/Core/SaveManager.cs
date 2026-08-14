@@ -75,6 +75,25 @@ public class SaveManager : MonoBehaviour
     }
 
     [Serializable]
+    public class SkillLevelsData
+    {
+        public int quickdrawLevel;
+        public int risingAttackLevel;
+        public int smashdownLevel;
+        public int bodySlamLevel;
+        public int grabThrowLevel;
+
+        public int bloodSpearLevel;
+        public int drainLevel;
+        public int hedgehogLevel;
+        public int eclipseLevel;
+        public int daughterOfDragonLevel;
+        public int steelBloodLevel;
+        public int heatBloodLevel;
+        public int coldBloodLevel;
+    }
+
+    [Serializable]
     public class QuestSaveData
     {
         public List<string> availableQuestIds = new();
@@ -91,6 +110,7 @@ public class SaveManager : MonoBehaviour
         public SessionData session = new();
         public List<string> litBonfires = new();
         public List<InventorySlotData> inventory = new();
+        public SkillLevelsData skillLevels = new();
         public QuestSaveData quests = new();
         public TimeData time = new();
     }
@@ -215,6 +235,7 @@ public class SaveManager : MonoBehaviour
         RecordPlayerStats();
         RecordSession();
         RecordInventory();
+        RecordSkillLevels();
         RecordQuests();
         RecordTime();
         RecordLitBonfire(bonfire.BonfireId);
@@ -233,6 +254,7 @@ public class SaveManager : MonoBehaviour
         RecordPlayerStats();
         RecordSession();
         RecordInventory();
+        RecordSkillLevels();
         RecordQuests();
         RecordTime();
         WriteFile();
@@ -276,6 +298,7 @@ public class SaveManager : MonoBehaviour
         player.SetBloodGage(Data.playerStats.currentBloodGage);
         player.SetBloodMoney(Data.playerStats.bloodMoney);
         ApplyInventory();
+        ApplySkillLevels();
         ApplyQuests();
         ApplyTime();
     }
@@ -374,6 +397,70 @@ public class SaveManager : MonoBehaviour
                 icon = icon,
                 quantity = slotData.quantity,
             });
+        }
+    }
+
+    private PlayerSlashSkill GetPlayerSlashSkill()
+    {
+        var player = PlayerControl.Instance;
+        return player != null ? player.GetComponent<PlayerSlashSkill>() : null;
+    }
+
+    private PlayerMagicSkill GetPlayerMagicSkill()
+    {
+        var player = PlayerControl.Instance;
+        return player != null ? player.GetComponent<PlayerMagicSkill>() : null;
+    }
+
+    private void RecordSkillLevels()
+    {
+        var slash = GetPlayerSlashSkill();
+        if (slash != null)
+        {
+            Data.skillLevels.quickdrawLevel = slash.quickdrawLevel;
+            Data.skillLevels.risingAttackLevel = slash.risingAttackLevel;
+            Data.skillLevels.smashdownLevel = slash.smashdownLevel;
+            Data.skillLevels.bodySlamLevel = slash.bodySlamLevel;
+            Data.skillLevels.grabThrowLevel = slash.grabThrowLevel;
+        }
+
+        var magic = GetPlayerMagicSkill();
+        if (magic != null)
+        {
+            Data.skillLevels.bloodSpearLevel = magic.bloodSpearLevel;
+            Data.skillLevels.drainLevel = magic.drainLevel;
+            Data.skillLevels.hedgehogLevel = magic.hedgehogLevel;
+            Data.skillLevels.eclipseLevel = magic.eclipseLevel;
+            Data.skillLevels.daughterOfDragonLevel = magic.daughterOfDragonLevel;
+            Data.skillLevels.steelBloodLevel = magic.steelBloodLevel;
+            Data.skillLevels.heatBloodLevel = magic.heatBloodLevel;
+            Data.skillLevels.coldBloodLevel = magic.coldBloodLevel;
+        }
+    }
+
+    private void ApplySkillLevels()
+    {
+        var slash = GetPlayerSlashSkill();
+        if (slash != null)
+        {
+            slash.ApplyQuickdrawLevel(Data.skillLevels.quickdrawLevel);
+            slash.ApplyRisingAttackLevel(Data.skillLevels.risingAttackLevel);
+            slash.ApplySmashdownLevel(Data.skillLevels.smashdownLevel);
+            slash.ApplyBodySlamLevel(Data.skillLevels.bodySlamLevel);
+            slash.ApplyGrabThrowLevel(Data.skillLevels.grabThrowLevel);
+        }
+
+        var magic = GetPlayerMagicSkill();
+        if (magic != null)
+        {
+            magic.ApplyBloodSpearLevel(Data.skillLevels.bloodSpearLevel);
+            magic.ApplyDrainLevel(Data.skillLevels.drainLevel);
+            magic.ApplyHedgehogLevel(Data.skillLevels.hedgehogLevel);
+            magic.ApplyEclipseLevel(Data.skillLevels.eclipseLevel);
+            magic.ApplyDaughterOfDragonLevel(Data.skillLevels.daughterOfDragonLevel);
+            magic.ApplySteelBloodLevel(Data.skillLevels.steelBloodLevel);
+            magic.ApplyHeatBloodLevel(Data.skillLevels.heatBloodLevel);
+            magic.ApplyColdBloodLevel(Data.skillLevels.coldBloodLevel);
         }
     }
 
