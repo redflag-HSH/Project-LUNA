@@ -521,10 +521,17 @@ public class PlayerControl : MonoBehaviour, IDamageable
             rb.gravityScale = 0f;
             rb.linearVelocity = Vector2.zero;
         }
-        else
+        else if (IsGrounded())
         {
             rb.gravityScale = 1f;
             rb.linearVelocity = new Vector2(moveInput * EffectiveSpeed, rb.linearVelocity.y);
+        }
+        else
+        {
+            // Airborne: don't re-steer horizontal velocity from live input (no running
+            // control mid-air) — whatever velocity existed at takeoff carries through as
+            // momentum, so a running jump stays fast and a walking jump stays slow.
+            rb.gravityScale = 1f;
         }
     }
 
