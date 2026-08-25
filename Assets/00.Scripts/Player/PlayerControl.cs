@@ -1482,6 +1482,34 @@ public class PlayerControl : MonoBehaviour, IDamageable
         transform.position = position;
     }
 
+    Coroutine _autoWalkCoroutine;
+
+    /// <summary>Simulates holding a direction key for a short time after arriving in a new
+    /// scene, so the player visually walks in rather than appearing frozen at the spawn
+    /// point. Real input overrides it immediately — pressing a movement key just overwrites
+    /// moveInput like any other frame, so this never fights the player.</summary>
+    public void AutoWalkIn(int direction, float duration)
+    {
+        if (_autoWalkCoroutine != null) StopCoroutine(_autoWalkCoroutine);
+        _autoWalkCoroutine = StartCoroutine(AutoWalkInRoutine(direction, duration));
+    }
+
+    IEnumerator AutoWalkInRoutine(int direction, float duration)
+    {
+        moveInput = direction;
+        lastFacingDir = direction;
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (moveInput == direction) moveInput = 0f;
+        _autoWalkCoroutine = null;
+    }
+
     public void Heal(float amount)
     {
         if (IsDead) return;

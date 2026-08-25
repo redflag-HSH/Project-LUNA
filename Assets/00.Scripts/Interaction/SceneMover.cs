@@ -7,6 +7,13 @@ public class SceneMover : MonoBehaviour, IInteractable
     [SerializeField] string _sceneName;
     [SerializeField] Vector2 _movePoint;
 
+    [Header("Entry Walk-In")]
+    [Tooltip("If true, the player keeps walking a short distance after arriving, instead of appearing frozen at the spawn point.")]
+    [SerializeField] bool _autoWalkIn;
+    [Tooltip("1 = walk in facing right, -1 = walk in facing left.")]
+    [SerializeField] int _entryWalkDirection = 1;
+    [SerializeField] float _entryWalkDuration = 0.3f;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!_interactOrEnter)
@@ -19,7 +26,8 @@ public class SceneMover : MonoBehaviour, IInteractable
     }
     void MoveOn()
     {
-        GameManager.Instance.LoadScene(_sceneName, _movePoint);
+        GameManager.Instance.LoadScene(_sceneName, _movePoint,
+            _autoWalkIn ? _entryWalkDirection : (int?)null, _entryWalkDuration);
     }
 
     private void OnDrawGizmos()

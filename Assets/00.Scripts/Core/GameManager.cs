@@ -163,25 +163,25 @@ public class GameManager : MonoBehaviour
     public void LoadScene(string sceneName)
     {
         SetState(GameState.Boot);
-        StartCoroutine(LoadSceneRoutine(sceneName, Vector2.zero));
+        StartCoroutine(LoadSceneRoutine(sceneName, null, null, 0.3f));
         TimeSystem.Instance.stopTimeSet();
     }
 
-    public void LoadScene(string sceneName, Vector2 spawnPosition)
+    public void LoadScene(string sceneName, Vector2 spawnPosition, int? entryWalkDirection = null, float entryWalkDuration = 0.3f)
     {
         SetState(GameState.Boot);
-        StartCoroutine(LoadSceneRoutine(sceneName, spawnPosition));
+        StartCoroutine(LoadSceneRoutine(sceneName, spawnPosition, entryWalkDirection, entryWalkDuration));
         TimeSystem.Instance.stopTimeSet();
     }
 
-    private IEnumerator LoadSceneRoutine(string sceneName, Vector2? spawn)
+    private IEnumerator LoadSceneRoutine(string sceneName, Vector2? spawn, int? entryWalkDirection, float entryWalkDuration)
     {
         _gameOverTriggered = false;
 
         if (!string.IsNullOrEmpty(_loadingScene))
         {
             _pendingTargetScene = sceneName;
-            SceneLoader.Set(sceneName, spawn);
+            SceneLoader.Set(sceneName, spawn, entryWalkDirection, entryWalkDuration);
             AsyncOperation op = SceneManager.LoadSceneAsync(_loadingScene);
             while (!op.isDone) yield return null;
         }
@@ -192,6 +192,7 @@ public class GameManager : MonoBehaviour
             while (!op.isDone) yield return null;
 
             ApplySpawnOverride(spawn);
+            ApplyEntryWalk(entryWalkDirection, entryWalkDuration);
             SetState(GameState.Playing);
         }
     }
@@ -204,10 +205,17 @@ public class GameManager : MonoBehaviour
         {
             _pendingTargetScene = null;
             ApplySpawnOverride(SceneLoader.SpawnOverride);
+            ApplyEntryWalk(SceneLoader.EntryWalkDirection, SceneLoader.EntryWalkDuration);
             SceneLoader.Clear();
             SetState(GameState.Playing);
             TimeSystem.Instance.StartTimeSet();
         }
+    }
+
+    private void ApplyEntryWalk(int? direction, float duration)
+    {
+        if (direction.HasValue && PlayerControl.Instance != null)
+            PlayerControl.Instance.AutoWalkIn(direction.Value, duration);
     }
 
     private void ApplySpawnOverride(Vector2? spawn)

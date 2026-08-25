@@ -209,7 +209,7 @@ public class SaveManager : MonoBehaviour
         if (HasSave())
         {
             _applyOnNextLoad = true;
-            GameManager.Instance.LoadScene(Data.checkpoint.sceneName);
+            GameManager.Instance.LoadScene(Data.checkpoint.sceneName, new Vector2(Data.checkpoint.posX, Data.checkpoint.posY));
         }
         else
         {
