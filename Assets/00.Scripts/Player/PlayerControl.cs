@@ -37,7 +37,12 @@ public class PlayerControl : MonoBehaviour, IDamageable
 
     [Header("Movement")]
     public float speed = 5f;
+    [Tooltip("Jump power for a short tap.")]
     public float jumpForce = 10f;
+    [Tooltip("Jump power reached if the jump button is still held after jumpHoldThreshold.")]
+    public float highJumpForce = 15f;
+    [Tooltip("Seconds the jump button must be held to reach highJumpForce instead of jumpForce.")]
+    public float jumpHoldThreshold = 0.15f;
     public float coyoteTime = 0.12f;
     public Transform groundCheck;
     public LayerMask groundLayer;
@@ -92,7 +97,9 @@ public class PlayerControl : MonoBehaviour, IDamageable
         (_slayedParts[(int)BodyPart.RightLeg] ? 1 : 0);
 
     float EffectiveSpeed => speed * BasicStatMultiplier * (_isRunning ? runSpeedMultiplier : 1f) * (SlayedLegCount == 2 ? 0.05f : SlayedLegCount == 1 ? 0.50f : 1f);
-    float EffectiveJumpForce => jumpForce * (SlayedLegCount == 2 ? 0f : SlayedLegCount == 1 ? 0.50f : 1f);
+    float LegJumpScale => SlayedLegCount == 2 ? 0f : SlayedLegCount == 1 ? 0.50f : 1f;
+    float EffectiveJumpForce => jumpForce * LegJumpScale;
+    float EffectiveHighJumpForce => highJumpForce * LegJumpScale;
     bool CanJump => SlayedLegCount < 2;
     bool AllLimbsCut => SlayedLegCount == 2 && !CanWeakAttack && !CanStrongAttack;
     float AttackDelayMultiplier => (SlayedLegCount == 2 ? 2.2f : SlayedLegCount == 1 ? 1.5f : 1f) * AttackSpeedTimeScale;
@@ -328,6 +335,9 @@ public class PlayerControl : MonoBehaviour, IDamageable
     float climbInput;
     bool jumpQueued;
     float _coyoteTimer;
+    bool _isHoldingJump;
+    bool _jumpBoosted;
+    float _jumpHoldTimer;
     int lastFacingDir = 1;
 
     bool isOnSlope;
@@ -399,6 +409,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         actions.Player2D.Move.performed += OnMove;
         actions.Player2D.Move.canceled += OnMove;
         actions.Player2D.Jump.performed += OnJump;
+        actions.Player2D.Jump.canceled += OnJumpRelease;
         actions.Player2D.LightAttack.performed += OnAttack;
         actions.Player2D.Dodge.performed += OnDodge;
         actions.Player2D.Dodge.canceled += OnDodgeRelease;
@@ -428,6 +439,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         actions.Player2D.Move.performed -= OnMove;
         actions.Player2D.Move.canceled -= OnMove;
         actions.Player2D.Jump.performed -= OnJump;
+        actions.Player2D.Jump.canceled -= OnJumpRelease;
         actions.Player2D.LightAttack.performed -= OnAttack;
         actions.Player2D.Dodge.performed -= OnDodge;
         actions.Player2D.Dodge.canceled -= OnDodgeRelease;
@@ -464,6 +476,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
         TickStunAccumulator();
         TickSkillCooldowns();
         TickCoyoteTime();
+        TickJumpHold();
         TickDeathblowIndicator();
         TickInteraction();
         TickRender();
@@ -587,7 +600,28 @@ public class PlayerControl : MonoBehaviour, IDamageable
         {
             jumpQueued = true;
             _coyoteTimer = 0f;
+            _isHoldingJump = true;
+            _jumpBoosted = false;
+            _jumpHoldTimer = 0f;
         }
+    }
+
+    void OnJumpRelease(InputAction.CallbackContext ctx)
+    {
+        _isHoldingJump = false;
+    }
+
+    void TickJumpHold()
+    {
+        if (!_isHoldingJump || _jumpBoosted) return;
+
+        _jumpHoldTimer += Time.deltaTime;
+        if (_jumpHoldTimer < jumpHoldThreshold) return;
+
+        _jumpBoosted = true;
+        _isHoldingJump = false;
+        if (rb.linearVelocity.y > 0f)
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, EffectiveHighJumpForce);
     }
 
     void OnAttack(InputAction.CallbackContext ctx)
@@ -1735,6 +1769,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
     {
         isOnLadder = true;
         jumpQueued = false;
+        _isHoldingJump = false;
         rb.gravityScale = 0f;
         rb.linearVelocity = Vector2.zero;
         rb.position = new Vector2(_currentLadder.LadderX, rb.position.y);
@@ -1769,6 +1804,7 @@ public class PlayerControl : MonoBehaviour, IDamageable
             actions.Player2D.Interact.Enable();
             moveInput = 0f;
             jumpQueued = false;
+            _isHoldingJump = false;
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         }
     }
