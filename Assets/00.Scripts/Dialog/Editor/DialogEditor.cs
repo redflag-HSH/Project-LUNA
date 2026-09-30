@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -44,6 +45,10 @@ public class DialogEditor : EditorWindow
     static readonly Color CardColor   = new(0.18f, 0.18f, 0.18f, 0.30f);
     static readonly Color ChoiceColor = new(0.12f, 0.22f, 0.12f, 0.40f);
     static readonly Color FolderColor = new(0.24f, 0.24f, 0.12f, 0.35f);
+    static readonly Color MatchColor  = new(0.60f, 0.48f, 0.10f, 0.35f);
+
+    // Strips rich-text / <ruby=…>…</ruby> tags so a searched phrase still matches across markup.
+    static readonly Regex MarkupTag = new(@"<[^>]*>");
 
     const string RootFolder = "Assets/04.Dialogs";
 
@@ -62,6 +67,16 @@ public class DialogEditor : EditorWindow
     Vector2 previewScroll;
     string  searchText  = "";
     bool    browseDirty = true;
+
+    // Query the tree was last rebuilt with; drawing uses this rather than the live text box so it matches the layout pass.
+    string appliedSearch = "";
+    bool   IsSearching => !string.IsNullOrWhiteSpace(appliedSearch);
+
+    // Dialogs that matched the search by their text rather than their file name → excerpt of the matching line.
+    Dictionary<Dialog, GUIContent> matchHints = new();
+
+    GUIStyle hintStyle;
+    GUIStyle placeholderStyle;
 
     // ── Window ────────────────────────────────────────────────────────────────
 
@@ -292,7 +307,11 @@ public class DialogEditor : EditorWindow
 
     void DrawBrowse()
     {
-        if (browseDirty) RefreshBrowse();
+        // Only on Layout: the results decide how many controls are drawn, so a mid-event rebuild would desync from layout.
+        if (browseDirty && Event.current.type == EventType.Layout) RefreshBrowse();
+
+        hintStyle        ??= new GUIStyle(EditorStyles.miniLabel) { padding = { left = 16 }, clipping = TextClipping.Clip };
+        placeholderStyle ??= new GUIStyle(EditorStyles.centeredGreyMiniLabel) { alignment = TextAnchor.MiddleLeft };
 
         EditorGUILayout.BeginHorizontal();
 
@@ -302,8 +321,14 @@ public class DialogEditor : EditorWindow
         EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
         EditorGUI.BeginChangeCheck();
         searchText = EditorGUILayout.TextField(searchText, EditorStyles.toolbarSearchField);
-        if (EditorGUI.EndChangeCheck()) RefreshBrowse();
-        if (GUILayout.Button("↺", EditorStyles.toolbarButton, GUILayout.Width(24))) RefreshBrowse();
+        if (string.IsNullOrEmpty(searchText))
+        {
+            Rect field = GUILayoutUtility.GetLastRect();
+            field.xMin += EditorStyles.toolbarSearchField.padding.left;
+            GUI.Label(field, "Name or dialog text…", placeholderStyle);
+        }
+        if (EditorGUI.EndChangeCheck()) RequestBrowseRefresh();
+        if (GUILayout.Button("↺", EditorStyles.toolbarButton, GUILayout.Width(24))) RequestBrowseRefresh();
         EditorGUILayout.EndHorizontal();
 
         browseScroll = EditorGUILayout.BeginScrollView(browseScroll);
@@ -337,10 +362,16 @@ public class DialogEditor : EditorWindow
                     selectedDialog = dialog;
 
                 GUI.backgroundColor = bg;
+
+                if (matchHints.TryGetValue(dialog, out GUIContent hint) && GUILayout.Button(hint, hintStyle))
+                    selectedDialog = dialog;
             }
             EditorGUI.indentLevel--;
             EditorGUILayout.Space(2);
         }
+
+        if (folderOrder.Count == 0 && IsSearching)
+            EditorGUILayout.HelpBox($"No dialog name or text contains \"{appliedSearch}\".", MessageType.None);
 
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
@@ -391,7 +422,7 @@ public class DialogEditor : EditorWindow
                 {
                     var l    = selectedDialog.lines[i];
                     var rect = EditorGUILayout.BeginVertical(GUI.skin.box);
-                    EditorGUI.DrawRect(rect, CardColor);
+                    EditorGUI.DrawRect(rect, IsSearching && LineMatches(l, appliedSearch) ? MatchColor : CardColor);
 
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField($"#{i + 1}", GUILayout.Width(28));
@@ -430,11 +461,19 @@ public class DialogEditor : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+    void RequestBrowseRefresh()
+    {
+        browseDirty = true;
+        Repaint();
+    }
+
     void RefreshBrowse()
     {
         browseDirty = false;
+        appliedSearch = searchText;
         folderMap.Clear();
         folderOrder.Clear();
+        matchHints.Clear();
 
         string[] guids = AssetDatabase.FindAssets("t:Dialog");
         foreach (var guid in guids)
@@ -442,8 +481,13 @@ public class DialogEditor : EditorWindow
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             var    dialog    = AssetDatabase.LoadAssetAtPath<Dialog>(assetPath);
             if (dialog == null) continue;
-            if (!string.IsNullOrEmpty(searchText) &&
-                !dialog.name.ToLower().Contains(searchText.ToLower())) continue;
+
+            if (IsSearching && !ContainsText(dialog.name, appliedSearch))
+            {
+                GUIContent hint = FindTextMatch(dialog, appliedSearch);
+                if (hint == null) continue;
+                matchHints[dialog] = hint;
+            }
 
             // folder relative to RootFolder, or full path if outside it
             string dir = Path.GetDirectoryName(assetPath).Replace('\\', '/');
@@ -460,6 +504,62 @@ public class DialogEditor : EditorWindow
             }
             folderMap[rel].Add(dialog);
         }
+    }
+
+    static bool ContainsText(string source, string query) =>
+        !string.IsNullOrEmpty(source) && source.IndexOf(query, System.StringComparison.OrdinalIgnoreCase) >= 0;
+
+    static string PlainText(string text) => string.IsNullOrEmpty(text) ? "" : MarkupTag.Replace(text, "");
+
+    /// <summary>True if the line's speaker, text (with or without markup) or a choice label contains the query.</summary>
+    static bool LineMatches(DialogLine line, string query)
+    {
+        if (line == null) return false;
+        if (ContainsText(line.speakerName, query) || ContainsText(line.text, query) || ContainsText(PlainText(line.text), query))
+            return true;
+        if (line.choices != null)
+            foreach (var choice in line.choices)
+                if (choice != null && ContainsText(choice.text, query)) return true;
+        return false;
+    }
+
+    /// <summary>Tree hint for the first line matching the query (full line as tooltip), or null if no line matches.</summary>
+    static GUIContent FindTextMatch(Dialog dialog, string query)
+    {
+        if (dialog.lines == null) return null;
+
+        int first = -1, count = 0;
+        for (int i = 0; i < dialog.lines.Length; i++)
+        {
+            if (!LineMatches(dialog.lines[i], query)) continue;
+            if (first < 0) first = i;
+            count++;
+        }
+        if (first < 0) return null;
+
+        DialogLine line = dialog.lines[first];
+        string speaker = string.IsNullOrWhiteSpace(line.speakerName) ? "" : $"{line.speakerName}: ";
+        string more    = count > 1 ? $"  (+{count - 1})" : "";
+        return new GUIContent($"#{first + 1} {speaker}{Excerpt(line, query)}{more}", PlainText(line.text));
+    }
+
+    /// <summary>A short slice of the line's text around the match, e.g. "…퀘스트 좀 받아가…".</summary>
+    static string Excerpt(DialogLine line, string query)
+    {
+        string plain = PlainText(line.text).Replace('\n', ' ');
+        int at = plain.IndexOf(query, System.StringComparison.OrdinalIgnoreCase);
+        if (at < 0)
+        {
+            // Matched on the speaker, a choice label, or text inside a tag.
+            if (line.choices != null)
+                foreach (var choice in line.choices)
+                    if (choice != null && ContainsText(choice.text, query)) return $"› {choice.text}";
+            return plain.Length > 30 ? plain.Substring(0, 30) + "…" : plain;
+        }
+
+        int start = Mathf.Max(0, at - 10);
+        int end   = Mathf.Min(plain.Length, at + query.Length + 20);
+        return (start > 0 ? "…" : "") + plain.Substring(start, end - start) + (end < plain.Length ? "…" : "");
     }
 
     // ── Logic ─────────────────────────────────────────────────────────────────
