@@ -166,7 +166,7 @@ public class QuestManager : MonoBehaviour
         OnQuestsChanged?.Invoke();
     }
 
-    /// <summary>Drives ReachLocation objectives. Hook this up to a QuestLocationTrigger.</summary>
+    /// <summary>Drives ReachLocation objectives. Called by UniversalEventTrigger's ReachLocation action.</summary>
     public void ReportLocationReached(string locationId)
     {
         if (string.IsNullOrEmpty(locationId)) return;

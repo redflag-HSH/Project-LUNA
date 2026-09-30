@@ -9,7 +9,7 @@ using UnityEngine.Playables;
 public class CutSceneTriggerSetupWindow : EditorWindow
 {
     // ── 설정 필드 ──────────────────────────────────────────────
-    private CutSceneTrigger.TriggerMode _mode = CutSceneTrigger.TriggerMode.Auto;
+    private UniversalEventTrigger.Activation _mode = UniversalEventTrigger.Activation.OnEnter;
     private bool _playOnce = true;
     private float _radius = 3f;
     private PlayableDirector _director;
@@ -57,9 +57,9 @@ public class CutSceneTriggerSetupWindow : EditorWindow
             new GUIContent("오브젝트 이름", "씬에 생성될 GameObject 이름"),
             _objectName);
 
-        _mode = (CutSceneTrigger.TriggerMode)EditorGUILayout.EnumPopup(
+        _mode = (UniversalEventTrigger.Activation)EditorGUILayout.EnumPopup(
             new GUIContent("트리거 모드",
-                "Auto: 범위 진입 즉시 재생\nInteract: 범위 안에서 상호작용키 입력 시 재생"),
+                "On Enter: 범위 진입 즉시 재생\nOn Interact: 범위 안에서 상호작용키 입력 시 재생 (Interact 레이어로 자동 설정)"),
             _mode);
 
         _playOnce = EditorGUILayout.Toggle(
@@ -118,11 +118,30 @@ public class CutSceneTriggerSetupWindow : EditorWindow
         GameObject go = new GameObject(_objectName);
         go.transform.position = spawnPos;
 
-        // 4. CutSceneTrigger 컴포넌트 추가 및 설정
-        CutSceneTrigger trigger = go.AddComponent<CutSceneTrigger>();
-        trigger.mode = _mode;
-        trigger.playOnce = _playOnce;
-        trigger.director = _director;
+        // 4. UniversalEventTrigger 컴포넌트 추가 및 설정 (Always → 컷씬 재생)
+        UniversalEventTrigger trigger = go.AddComponent<UniversalEventTrigger>();
+        trigger.activation = _mode;
+        trigger.triggerOnce = _playOnce;
+        trigger.branches = new[]
+        {
+            new UniversalEventTrigger.EventBranch
+            {
+                condition = UniversalEventTrigger.Condition.Always,
+                actions = new[]
+                {
+                    new UniversalEventTrigger.EventAction
+                    {
+                        type = UniversalEventTrigger.ActionType.PlayCutscene,
+                        director = _director
+                    }
+                }
+            }
+        };
+
+        // Interact 모드는 플레이어의 상호작용 감지가 Interact 레이어만 검사하므로 레이어를 맞춘다
+        int interactLayer = LayerMask.NameToLayer("Interact");
+        if (_mode == UniversalEventTrigger.Activation.OnInteract && interactLayer >= 0)
+            go.layer = interactLayer;
 
         // 5. CircleCollider2D 추가 (IsTrigger = true)
         CircleCollider2D col = go.AddComponent<CircleCollider2D>();
@@ -159,7 +178,7 @@ public class CutSceneTriggerSetupWindow : EditorWindow
     // ── 필드 초기화 ────────────────────────────────────────────
     private void ResetFields()
     {
-        _mode = CutSceneTrigger.TriggerMode.Auto;
+        _mode = UniversalEventTrigger.Activation.OnEnter;
         _playOnce = true;
         _radius = 3f;
         _director = null;

@@ -3000,27 +3000,60 @@ MonoBehaviour:
   m_GameObject: {fileID: 687339321}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7199e306219b3ff438a13738a65ae409, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ada624878a84227b4fb4f1a366dafde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  conditionalDialogs:
+  activation: 0
+  triggerOnce: 0
+  branches:
   - condition: 4
     quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
     objectiveId: TalkToNPC
-    dialog: {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
+    actions:
+    - type: 0
+      dialog: {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
+      director: {fileID: 0}
+      cutsceneVCam: {fileID: 0}
+      questBoard: {fileID: 0}
+      quest: {fileID: 0}
+      objectiveId: 
+      locationId: 
   - condition: 3
     quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
     objectiveId: 
-    dialog: {fileID: 11400000, guid: 2288d8efcf65f1644ad49ad8752dfe35, type: 2}
+    actions:
+    - type: 0
+      dialog: {fileID: 11400000, guid: 2288d8efcf65f1644ad49ad8752dfe35, type: 2}
+      director: {fileID: 0}
+      cutsceneVCam: {fileID: 0}
+      questBoard: {fileID: 0}
+      quest: {fileID: 0}
+      objectiveId: 
+      locationId: 
   - condition: 1
     quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
     objectiveId: 
-    dialog: {fileID: 11400000, guid: 7d1bc9dd00f110f458140a7d51bab883, type: 2}
+    actions:
+    - type: 0
+      dialog: {fileID: 11400000, guid: 7d1bc9dd00f110f458140a7d51bab883, type: 2}
+      director: {fileID: 0}
+      cutsceneVCam: {fileID: 0}
+      questBoard: {fileID: 0}
+      quest: {fileID: 0}
+      objectiveId: 
+      locationId: 
   - condition: 0
     quest: {fileID: 11400000, guid: 725b1823cc11ffc4d8664711b5c3bd4b, type: 2}
     objectiveId: 
-    dialog: {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
-  dialog: {fileID: 0}
+    actions:
+    - type: 0
+      dialog: {fileID: 11400000, guid: 900e7adb86fce274cb78a7d366db921d, type: 2}
+      director: {fileID: 0}
+      cutsceneVCam: {fileID: 0}
+      questBoard: {fileID: 0}
+      quest: {fileID: 0}
+      objectiveId: 
+      locationId: 
 --- !u!61 &687339323
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3913,10 +3946,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 911605173}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df41d395ed15cba439a75afbae397f6c, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ada624878a84227b4fb4f1a366dafde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  questBoard: {fileID: 1423462949}
+  activation: 0
+  triggerOnce: 0
+  branches:
+  - condition: 0
+    quest: {fileID: 0}
+    objectiveId: 
+    actions:
+    - type: 2
+      dialog: {fileID: 0}
+      director: {fileID: 0}
+      cutsceneVCam: {fileID: 0}
+      questBoard: {fileID: 1423462949}
+      quest: {fileID: 0}
+      objectiveId: 
+      locationId: 
 --- !u!212 &911605175
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5033,11 +5080,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1267957167}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7199e306219b3ff438a13738a65ae409, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ada624878a84227b4fb4f1a366dafde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  conditionalDialogs: []
-  dialog: {fileID: 11400000, guid: 1684779220fa844499735282855cdfc7, type: 2}
+  activation: 0
+  triggerOnce: 0
+  branches:
+  - condition: 0
+    quest: {fileID: 0}
+    objectiveId: 
+    actions:
+    - type: 0
+      dialog: {fileID: 11400000, guid: 1684779220fa844499735282855cdfc7, type: 2}
+      director: {fileID: 0}
+      cutsceneVCam: {fileID: 0}
+      questBoard: {fileID: 0}
+      quest: {fileID: 0}
+      objectiveId: 
+      locationId: 
 --- !u!61 &1267957169
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6775,13 +6835,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1721946774}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c64f6c44f864cf742a646f0adbccab9c, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ada624878a84227b4fb4f1a366dafde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 0
-  playOnce: 1
-  director: {fileID: 1721946775}
-  cutsceneVCam: {fileID: 0}
+  activation: 1
+  triggerOnce: 1
+  branches:
+  - condition: 0
+    quest: {fileID: 0}
+    objectiveId: 
+    actions:
+    - type: 1
+      dialog: {fileID: 0}
+      director: {fileID: 1721946775}
+      cutsceneVCam: {fileID: 0}
+      questBoard: {fileID: 0}
+      quest: {fileID: 0}
+      objectiveId: 
+      locationId: 
 --- !u!58 &1721946778
 CircleCollider2D:
   m_ObjectHideFlags: 0

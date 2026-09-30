@@ -2,10 +2,10 @@ using UnityEngine;
 
 /// <summary>
 /// How an objective is driven to completion. Each type has one intended caller:
-///   Manual        - QuestManager.CompleteObjective (dialog end, cutscene, other script)
+///   Manual        - QuestManager.CompleteObjective (dialog end, UniversalEventTrigger action, other script)
 ///   KillCount     - QuestManager.ReportKill (from GameManager.OnEnemyKilledWithId)
 ///   CollectItem   - QuestManager.ReportItemQuantity (from Inventory.OnAnyItemAdded)
-///   ReachLocation - QuestManager.ReportLocationReached (from QuestLocationTrigger)
+///   ReachLocation - QuestManager.ReportLocationReached (from a UniversalEventTrigger ReachLocation action)
 ///   WinBattle     - QuestManager.ReportBattleResult (from a future SRPG BattleManager)
 /// </summary>
 public enum QuestObjectiveType
