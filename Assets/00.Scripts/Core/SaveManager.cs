@@ -103,8 +103,8 @@ public class SaveManager : MonoBehaviour
     public class QuestSaveData
     {
         public List<string> availableQuestIds = new();
-        public List<string> activeQuestIds = new();
-        public List<QuestManager.QuestProgressSave> activeQuestProgress = new();
+        public List<string> onProgressQuestIds = new();
+        public List<QuestManager.QuestProgressSave> onProgressQuestProgress = new();
         public List<string> completedQuestIds = new();
     }
 
@@ -505,11 +505,11 @@ public class SaveManager : MonoBehaviour
         foreach (var q in qm.AvailableQuests)
             Data.quests.availableQuestIds.Add(q.questId);
 
-        Data.quests.activeQuestIds.Clear();
-        foreach (var q in qm.ActiveQuests)
-            Data.quests.activeQuestIds.Add(q.questId);
+        Data.quests.onProgressQuestIds.Clear();
+        foreach (var q in qm.OnProgressQuests)
+            Data.quests.onProgressQuestIds.Add(q.questId);
 
-        Data.quests.activeQuestProgress = qm.ExportProgress();
+        Data.quests.onProgressQuestProgress = qm.ExportProgress();
 
         Data.quests.completedQuestIds.Clear();
         foreach (var id in qm.CompletedQuestIds)
@@ -521,7 +521,7 @@ public class SaveManager : MonoBehaviour
         var qm = QuestManager.Instance;
         if (qm == null) return;
 
-        qm.LoadFromSave(Data.quests.availableQuestIds, Data.quests.activeQuestIds, Data.quests.completedQuestIds, Data.quests.activeQuestProgress);
+        qm.LoadFromSave(Data.quests.availableQuestIds, Data.quests.onProgressQuestIds, Data.quests.completedQuestIds, Data.quests.onProgressQuestProgress);
     }
 
     private void RecordTime()

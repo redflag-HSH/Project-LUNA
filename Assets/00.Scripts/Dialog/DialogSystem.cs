@@ -308,7 +308,7 @@ public class DialogSystem : MonoBehaviour
         switch (dialog.questAction)
         {
             case DialogQuestAction.AddAvailable: QuestManager.Instance.AddAvailableQuest(dialog.quest); break;
-            case DialogQuestAction.AddActive: QuestManager.Instance.AddQuest(dialog.quest); break;
+            case DialogQuestAction.AddOnProgress: QuestManager.Instance.AddQuest(dialog.quest); break;
             case DialogQuestAction.CompleteObjective: QuestManager.Instance.CompleteObjective(dialog.quest, dialog.questObjectiveId); break;
         }
     }

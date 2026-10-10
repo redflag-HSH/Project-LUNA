@@ -6,7 +6,7 @@ public enum DialogQuestAction
 {
     None,
     AddAvailable,      // quest shows up on the quest board
-    AddActive,         // quest is accepted immediately
+    AddOnProgress,         // quest is accepted immediately
     CompleteObjective  // completes the objective named by questObjectiveId on the quest below
 }
 

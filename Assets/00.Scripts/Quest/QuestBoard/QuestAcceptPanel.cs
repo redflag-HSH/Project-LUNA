@@ -12,7 +12,7 @@ using UnityEngine.UI;
 ///   └─ QuestAcceptPanel (this script)
 ///      └─ Panel            (background, assign as `panel`)
 ///         ├─ InfoText      (TextMeshProUGUI)
-///         ├─ MessageText   (TextMeshProUGUI — shown when accepting fails, e.g. already have an active quest)
+///         ├─ MessageText   (TextMeshProUGUI — shown when accepting fails, e.g. already have an on-progress quest)
 ///         ├─ AcceptButton  (Button)
 ///         └─ DeclineButton (Button)
 /// </summary>

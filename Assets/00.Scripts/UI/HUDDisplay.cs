@@ -48,7 +48,7 @@ public class HUDDisplay : MonoBehaviour
                 Destroy(child.gameObject);
         }
 
-        var quests = QuestManager.Instance != null ? QuestManager.Instance.ActiveQuests : null;
+        var quests = QuestManager.Instance != null ? QuestManager.Instance.OnProgressQuests : null;
         bool hasAny = quests != null && quests.Count > 0;
         questHUD.SetActive(hasAny);
 

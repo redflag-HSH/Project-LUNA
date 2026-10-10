@@ -37,8 +37,8 @@ public class QuestManager : MonoBehaviour
     [Tooltip("All QuestData assets in the project. Required for save/load lookup.")]
     [SerializeField] QuestData[] _registry;
 
-    [Tooltip("How many quests the player can have active at once.")]
-    [SerializeField] int maxActiveQuests = 5;
+    [Tooltip("How many quests the player can have on progress at once.")]
+    [SerializeField] int maxOnProgressQuests = 5;
 
     // ── Events ────────────────────────────────────────────────────────────────
 
@@ -64,18 +64,18 @@ public class QuestManager : MonoBehaviour
     }
 
     readonly List<QuestData> _available = new();
-    readonly List<QuestData> _active = new();
+    readonly List<QuestData> _onProgress = new();
     readonly HashSet<string> _completed = new();
-    readonly Dictionary<string, QuestProgress> _progress = new();   // questId → progress, active quests only
+    readonly Dictionary<string, QuestProgress> _progress = new();   // questId → progress, on-progress quests only
 
     public IReadOnlyList<QuestData> AvailableQuests => _available;
-    public IReadOnlyList<QuestData> ActiveQuests => _active;
+    public IReadOnlyList<QuestData> OnProgressQuests => _onProgress;
     public IEnumerable<string> CompletedQuestIds => _completed;
 
     // ── Public API ────────────────────────────────────────────────────────────
 
     public bool IsAvailable(QuestData quest) => _available.Contains(quest);
-    public bool IsActive(QuestData quest) => _active.Contains(quest);
+    public bool IsOnProgress(QuestData quest) => _onProgress.Contains(quest);
     public bool IsCompleted(QuestData quest) => _completed.Contains(quest.questId);
 
     public bool IsObjectiveComplete(QuestData quest, string objectiveId)
@@ -85,11 +85,11 @@ public class QuestManager : MonoBehaviour
                progress.completedObjectiveIds.Contains(objectiveId);
     }
 
-    /// <summary>True if the quest is active, this objective isn't complete yet, and every
+    /// <summary>True if the quest is on progress, this objective isn't complete yet, and every
     /// prerequisite objective (if any) is complete.</summary>
-    public bool IsObjectiveActive(QuestData quest, string objectiveId)
+    public bool IsObjectiveOnProgress(QuestData quest, string objectiveId)
     {
-        if (quest == null || string.IsNullOrEmpty(objectiveId) || !_active.Contains(quest)) return false;
+        if (quest == null || string.IsNullOrEmpty(objectiveId) || !_onProgress.Contains(quest)) return false;
         if (IsObjectiveComplete(quest, objectiveId)) return false;
 
         var objective = FindObjective(quest, objectiveId);
@@ -110,11 +110,11 @@ public class QuestManager : MonoBehaviour
                progress.counters.TryGetValue(objectiveId, out int count) ? count : 0;
     }
 
-    /// <summary>Marks an objective complete (if it's currently active) and checks whether
+    /// <summary>Marks an objective complete (if it's currently on progress) and checks whether
     /// that finishes the whole quest. Called directly for Manual objectives (e.g. from dialog).</summary>
     public void CompleteObjective(QuestData quest, string objectiveId)
     {
-        if (!IsObjectiveActive(quest, objectiveId)) return;
+        if (!IsObjectiveOnProgress(quest, objectiveId)) return;
 
         GetOrCreateProgress(quest.questId).completedObjectiveIds.Add(objectiveId);
         OnQuestsChanged?.Invoke();
@@ -127,11 +127,11 @@ public class QuestManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(monsterId)) return;
 
-        foreach (var quest in _active.ToArray())
+        foreach (var quest in _onProgress.ToArray())
             foreach (var objective in QuestObjectivesOf(quest))
             {
                 if (objective.type != QuestObjectiveType.KillCount || objective.targetId != monsterId) continue;
-                if (!IsObjectiveActive(quest, objective.objectiveId)) continue;
+                if (!IsObjectiveOnProgress(quest, objective.objectiveId)) continue;
 
                 var progress = GetOrCreateProgress(quest.questId);
                 progress.counters.TryGetValue(objective.objectiveId, out int count);
@@ -151,11 +151,11 @@ public class QuestManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(itemKey)) return;
 
-        foreach (var quest in _active.ToArray())
+        foreach (var quest in _onProgress.ToArray())
             foreach (var objective in QuestObjectivesOf(quest))
             {
                 if (objective.type != QuestObjectiveType.CollectItem || objective.targetId != itemKey) continue;
-                if (!IsObjectiveActive(quest, objective.objectiveId)) continue;
+                if (!IsObjectiveOnProgress(quest, objective.objectiveId)) continue;
 
                 GetOrCreateProgress(quest.questId).counters[objective.objectiveId] = currentQuantity;
 
@@ -171,11 +171,11 @@ public class QuestManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(locationId)) return;
 
-        foreach (var quest in _active.ToArray())
+        foreach (var quest in _onProgress.ToArray())
             foreach (var objective in QuestObjectivesOf(quest))
             {
                 if (objective.type != QuestObjectiveType.ReachLocation || objective.targetId != locationId) continue;
-                if (IsObjectiveActive(quest, objective.objectiveId))
+                if (IsObjectiveOnProgress(quest, objective.objectiveId))
                     CompleteObjective(quest, objective.objectiveId);
             }
     }
@@ -186,11 +186,11 @@ public class QuestManager : MonoBehaviour
     {
         if (!won || string.IsNullOrEmpty(battleId)) return;
 
-        foreach (var quest in _active.ToArray())
+        foreach (var quest in _onProgress.ToArray())
             foreach (var objective in QuestObjectivesOf(quest))
             {
                 if (objective.type != QuestObjectiveType.WinBattle || objective.targetId != battleId) continue;
-                if (IsObjectiveActive(quest, objective.objectiveId))
+                if (IsObjectiveOnProgress(quest, objective.objectiveId))
                     CompleteObjective(quest, objective.objectiveId);
             }
     }
@@ -198,7 +198,7 @@ public class QuestManager : MonoBehaviour
     public void AddAvailableQuest(QuestData quest)
     {
         if (quest == null || _available.Contains(quest)) return;
-        if (_active.Contains(quest)) return;
+        if (_onProgress.Contains(quest)) return;
         // A completed quest can only be offered again if it is repeatable.
         if (!quest.repeatable && _completed.Contains(quest.questId)) return;
         if (_available.Count >= MaxAvailableQuests) return;
@@ -212,15 +212,15 @@ public class QuestManager : MonoBehaviour
             OnQuestsChanged?.Invoke();
     }
 
-    /// <returns>False if the quest could not be made active (already active/completed,
-    /// or the player already has the maximum number of active quests).</returns>
+    /// <returns>False if the quest could not be put on progress (already on progress/completed,
+    /// or the player already has the maximum number of on-progress quests).</returns>
     public bool AddQuest(QuestData quest)
     {
-        if (quest == null || _active.Contains(quest)) return false;
+        if (quest == null || _onProgress.Contains(quest)) return false;
         if (!quest.repeatable && _completed.Contains(quest.questId)) return false;
-        if (_active.Count >= maxActiveQuests) return false;
+        if (_onProgress.Count >= maxOnProgressQuests) return false;
         _available.Remove(quest);
-        _active.Add(quest);
+        _onProgress.Add(quest);
         _progress[quest.questId] = new QuestProgress();
         OnQuestsChanged?.Invoke();
         return true;
@@ -229,7 +229,7 @@ public class QuestManager : MonoBehaviour
     public void CompleteQuest(QuestData quest)
     {
         if (quest == null) return;
-        _active.Remove(quest);
+        _onProgress.Remove(quest);
         _progress.Remove(quest.questId);
         _completed.Add(quest.questId);
         OnQuestsChanged?.Invoke();
@@ -237,7 +237,7 @@ public class QuestManager : MonoBehaviour
 
     public void RemoveQuest(QuestData quest)
     {
-        if (_active.Remove(quest))
+        if (_onProgress.Remove(quest))
         {
             _progress.Remove(quest.questId);
             OnQuestsChanged?.Invoke();
@@ -249,7 +249,7 @@ public class QuestManager : MonoBehaviour
     public List<QuestProgressSave> ExportProgress()
     {
         var result = new List<QuestProgressSave>();
-        foreach (var quest in _active)
+        foreach (var quest in _onProgress)
         {
             if (!_progress.TryGetValue(quest.questId, out var progress)) continue;
 
@@ -265,11 +265,11 @@ public class QuestManager : MonoBehaviour
         return result;
     }
 
-    public void LoadFromSave(List<string> availableIds, List<string> activeIds, List<string> completedIds,
-        List<QuestProgressSave> activeProgress = null)
+    public void LoadFromSave(List<string> availableIds, List<string> onProgressIds, List<string> completedIds,
+        List<QuestProgressSave> onProgressQuestProgress = null)
     {
         _available.Clear();
-        _active.Clear();
+        _onProgress.Clear();
         _completed.Clear();
         _progress.Clear();
 
@@ -283,7 +283,7 @@ public class QuestManager : MonoBehaviour
             else Debug.LogWarning($"[QuestManager] No quest found for id '{id}' — skipped.");
         }
 
-        foreach (var id in activeIds)
+        foreach (var id in onProgressIds)
         {
             var quest = FindById(id);
             if (quest == null)
@@ -291,13 +291,13 @@ public class QuestManager : MonoBehaviour
                 Debug.LogWarning($"[QuestManager] No quest found for id '{id}' — skipped.");
                 continue;
             }
-            _active.Add(quest);
+            _onProgress.Add(quest);
             _progress[quest.questId] = new QuestProgress();
         }
 
-        if (activeProgress != null)
+        if (onProgressQuestProgress != null)
         {
-            foreach (var entry in activeProgress)
+            foreach (var entry in onProgressQuestProgress)
             {
                 if (!_progress.TryGetValue(entry.questId, out var progress)) continue;
 

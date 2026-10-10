@@ -34,7 +34,7 @@ public class QuestObjective
     [Tooltip("Used by KillCount / CollectItem.")]
     public int requiredCount = 1;
 
-    [Tooltip("Objective ids that must be complete before this one can progress. Empty = active from quest start.")]
+    [Tooltip("Objective ids that must be complete before this one can progress. Empty = on progress from quest start.")]
     public string[] prerequisiteObjectiveIds;
 
     [Tooltip("If true, this objective does not block quest completion on its own.")]

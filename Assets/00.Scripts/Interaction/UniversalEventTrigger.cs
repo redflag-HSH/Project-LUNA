@@ -11,10 +11,10 @@ public class UniversalEventTrigger : MonoBehaviour, IInteractable
     public enum Condition
     {
         Always,                 // always matches
-        QuestNotStarted,        // quest is not available, active, or completed
+        QuestNotStarted,        // quest is not available, on progress, or completed
         QuestAvailable,         // quest is on the board / offered
-        QuestActive,            // quest has been accepted
-        QuestObjectiveComplete, // quest is active AND the given objective is complete
+        QuestOnProgress,            // quest has been accepted
+        QuestObjectiveComplete, // quest is on progress AND the given objective is complete
         QuestCompleted          // quest is done
     }
 
@@ -24,7 +24,7 @@ public class UniversalEventTrigger : MonoBehaviour, IInteractable
         PlayCutscene,
         OpenQuestBoard,
         AddAvailableQuest,
-        AddActiveQuest,
+        AddOnProgressQuest,
         CompleteObjective,
         ReachLocation
     }
@@ -41,7 +41,7 @@ public class UniversalEventTrigger : MonoBehaviour, IInteractable
         public QuestBoard questBoard;
         public QuestData quest;
         public string objectiveId;
-        [Tooltip("Matched against the targetId of active quests' ReachLocation objectives.")]
+        [Tooltip("Matched against the targetId of on-progress quests' ReachLocation objectives.")]
         public string locationId;
     }
 
@@ -105,11 +105,11 @@ public class UniversalEventTrigger : MonoBehaviour, IInteractable
         switch (branch.condition)
         {
             case Condition.QuestAvailable: return qm.IsAvailable(branch.quest);
-            case Condition.QuestActive:    return qm.IsActive(branch.quest);
+            case Condition.QuestOnProgress:    return qm.IsOnProgress(branch.quest);
             case Condition.QuestObjectiveComplete: return qm.IsObjectiveComplete(branch.quest, branch.objectiveId);
             case Condition.QuestCompleted: return qm.IsCompleted(branch.quest);
             case Condition.QuestNotStarted:
-                return !qm.IsAvailable(branch.quest) && !qm.IsActive(branch.quest) && !qm.IsCompleted(branch.quest);
+                return !qm.IsAvailable(branch.quest) && !qm.IsOnProgress(branch.quest) && !qm.IsCompleted(branch.quest);
             default: return false;
         }
     }
@@ -202,7 +202,7 @@ public class UniversalEventTrigger : MonoBehaviour, IInteractable
         switch (action.type)
         {
             case ActionType.AddAvailableQuest: qm.AddAvailableQuest(action.quest); break;
-            case ActionType.AddActiveQuest:    qm.AddQuest(action.quest); break;
+            case ActionType.AddOnProgressQuest:    qm.AddQuest(action.quest); break;
             case ActionType.CompleteObjective: qm.CompleteObjective(action.quest, action.objectiveId); break;
             case ActionType.ReachLocation:     qm.ReportLocationReached(action.locationId); break;
         }

@@ -155,7 +155,7 @@ public class UniversalEventTriggerEditor : Editor
                 break;
 
             case UniversalEventTrigger.ActionType.AddAvailableQuest:
-            case UniversalEventTrigger.ActionType.AddActiveQuest:
+            case UniversalEventTrigger.ActionType.AddOnProgressQuest:
                 RequiredField(action, "quest", "Assign a quest.");
                 break;
 
