@@ -39,6 +39,12 @@ public class UniversalEventTriggerEditor : Editor
             EditorGUILayout.LabelField("Runs once per scene load. It stays armed until one of its branches actually matches.",
                 EditorStyles.wordWrappedMiniLabel);
 
+        if (GUILayout.Button("Open in Event Trigger Graph"))
+        {
+            EventTriggerGraphWindow.Open(trigger);
+            GUIUtility.ExitGUI();
+        }
+
         EditorGUILayout.Space(8);
         DrawBranches();
 
@@ -203,7 +209,7 @@ public class UniversalEventTriggerEditor : Editor
         return array.GetArrayElementAtIndex(array.arraySize - 1);
     }
 
-    static void ResetBranch(SerializedProperty branch)
+    internal static void ResetBranch(SerializedProperty branch)
     {
         branch.FindPropertyRelative("condition").enumValueIndex = (int)UniversalEventTrigger.Condition.Always;
         branch.FindPropertyRelative("quest").objectReferenceValue = null;
@@ -211,7 +217,7 @@ public class UniversalEventTriggerEditor : Editor
         branch.FindPropertyRelative("actions").arraySize = 0;
     }
 
-    static void ResetAction(SerializedProperty action)
+    internal static void ResetAction(SerializedProperty action)
     {
         action.FindPropertyRelative("type").enumValueIndex = (int)UniversalEventTrigger.ActionType.PlayDialog;
         foreach (string field in ActionObjectFields)
